@@ -8,64 +8,111 @@
 import WidgetKit
 import SwiftUI
 
+// Model data sederhana untuk Widget
+struct WidgetBook {
+    let id: String
+    let quote: String
+    let genre: String
+    let mascotImageName: String
+}
+
 struct Provider: TimelineProvider {
     func placeholder(in context: Context) -> SimpleEntry {
-        SimpleEntry(date: Date(), quote: "In the depths of winter, I finally learned...", genre: "Philosophy")
+        SimpleEntry(date: Date(), book: WidgetBook(
+            id: "dummy_1",
+            quote: "In the depths of winter, I finally learned that within me there lay an invincible summer.",
+            genre: "Philosophy",
+            mascotImageName: "Readingflip" // 👈 FIXED
+        ))
     }
 
     func getSnapshot(in context: Context, completion: @escaping (SimpleEntry) -> ()) {
-        let entry = SimpleEntry(date: Date(), quote: "Read to live, not live to read.", genre: "Classic")
+        let entry = SimpleEntry(date: Date(), book: WidgetBook(
+            id: "dummy_1",
+            quote: "The measure of a man is what he does with power.",
+            genre: "Philosophy",
+            mascotImageName: "Readingflip" // 👈 FIXED
+        ))
         completion(entry)
     }
 
     func getTimeline(in context: Context, completion: @escaping (Timeline<Entry>) -> ()) {
         let currentDate = Date()
-        // Mengatur siklus pembaruan Widget setiap 2 jam sekali
         let refreshDate = Calendar.current.date(byAdding: .hour, value: 2, to: currentDate)!
         
-        let entry = SimpleEntry(date: currentDate, quote: "The secret of getting ahead is getting started.", genre: "Fiction")
-        let timeline = Timeline(entries: [entry], policy: .atEnd)
+        let entry = SimpleEntry(date: currentDate, book: WidgetBook(
+            id: "dummy_1",
+            quote: "The measure of a man is what he does with power.",
+            genre: "Philosophy",
+            mascotImageName: "Readingflip" // 👈 FIX: Di sini kemarin masih "Reading", makanya crash!
+        ))
+        let timeline = Timeline(entries: [entry], policy: .after(refreshDate))
         completion(timeline)
     }
 }
 
 struct SimpleEntry: TimelineEntry {
     let date: Date
-    let quote: String
-    let genre: String
+    let book: WidgetBook
 }
 
 struct HiddenShelfWidgetEntryView : View {
     var entry: Provider.Entry
+    @Environment(\.widgetFamily) var family
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            HStack {
-                Text("📚 Hidden Shelf Quote")
-                    .font(.caption2)
-                    .bold()
-                    .foregroundColor(Theme.carob)
-                Spacer()
+        HStack(spacing: 16) {
+            
+            // 1. Bagian Kiri: Maskot
+            Image(entry.book.mascotImageName)
+                .resizable()
+                .scaledToFit()
+                .frame(width: 75, height: 75)
+                .padding(.leading, 4)
+            
+            // 2. Bagian Kanan: Petik, Quotes, Petik Bawah, & Genre
+            VStack(alignment: .leading, spacing: 4) {
+                
+                // Ikon Petik Pembuka
+                Text("“")
+                    .font(.system(size: 28, design: .serif))
+                    .foregroundColor(Color(hex: "725C3A").opacity(0.3))
+                    .frame(height: 8)
+                
+                // Kutipan Buku (Quotes)
+                Text(entry.book.quote)
+                    .font(.system(size: 12, weight: .medium, design: .serif))
+                    .italic()
+                    .foregroundColor(Color(hex: "725C3A"))
+                    .multilineTextAlignment(.leading)
+                    .lineLimit(3) // Batasi 3 baris agar ruang muat untuk komponen lain
+                    .padding(.horizontal, 12)
+                
+                // Ikon Petik Penutup (FIXED: Sekarang muncul di kanan bawah teks)
+                HStack {
+                    Spacer()
+                    Text("”")
+                        .font(.system(size: 28, design: .serif))
+                        .foregroundColor(Color(hex: "725C3A").opacity(0.3))
+                        .frame(height: 8)
+                }
+                .padding(.trailing, 8)
+                
+                Spacer(minLength: 0)
+                
+                // Label Genre
+                Text(entry.book.genre)
+                    .font(.system(size: 9, weight: .bold))
+                    .padding(.vertical, 4)
+                    .padding(.horizontal, 10)
+                    .background(Color(hex: "809671").opacity(0.2))
+                    .cornerRadius(8)
+                    .foregroundColor(Color(hex: "725C3A"))
             }
-            
-            Text("\"\(entry.quote)\"")
-                .font(.system(.footnote, design: .serif))
-                .italic()
-                .foregroundColor(Theme.carob)
-                .lineLimit(3)
-            
-            Spacer()
-            
-            Text(entry.genre)
-                .font(.system(size: 9))
-                .padding(.vertical, 3)
-                .padding(.horizontal, 8)
-                .background(Color(hex: "809671").opacity(0.2))
-                .cornerRadius(8)
-                .foregroundColor(Theme.carob)
         }
-        .padding()
-        .background(Theme.almond) // Warna Almond global
+        .padding(14)
+        .containerBackground(Color(hex: "F7F5F0"), for: .widget)
+        .widgetURL(URL(string: "hiddenshelf://book/\(entry.book.id)")!)
     }
 }
 
@@ -77,8 +124,32 @@ struct HiddenShelfWidget: Widget {
         StaticConfiguration(kind: kind, provider: Provider()) { entry in
             HiddenShelfWidgetEntryView(entry: entry)
         }
-        .configurationDisplayName("Hidden Shelf Daily Quote")
-        .description("Menampilkan kutipan buku misteri dari pengguna sekitar secara acak.")
-        .supportedFamilies([.systemSmall, .systemMedium])
+        .configurationDisplayName("Mystery Book")
+        .description("Intip satu kutipan buku misteri hari ini.")
+        .supportedFamilies([.systemMedium])
     }
+}
+
+// MARK: - PREVIEW AREA
+#Preview(as: .systemMedium) {
+    HiddenShelfWidget()
+} timeline: {
+    SimpleEntry(
+        date: Date(),
+        book: WidgetBook(
+            id: "dummy_preview",
+            quote: "The measure of a man is what he does with power.",
+            genre: "Philosophy",
+            mascotImageName: "Readingflip"
+        )
+    )
+    SimpleEntry(
+        date: Date(),
+        book: WidgetBook(
+            id: "dummy_preview_2",
+            quote: "In the depths of winter, I finally learned that within me there lay an invincible summer.",
+            genre: "Classic",
+            mascotImageName: "Readingflip"
+        )
+    )
 }

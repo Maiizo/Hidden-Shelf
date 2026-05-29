@@ -65,7 +65,7 @@ struct DiscoveryView: View {
                         }
                         
                         VStack(alignment: .leading, spacing: 6) {
-                            Text("Hai, Chelsea! 👋")
+                            Text("Hai, Chelsea!")
                                 .font(.system(size: 24, weight: .bold, design: .serif))
                                 .foregroundColor(Color(hex: "725C3A"))
                             
