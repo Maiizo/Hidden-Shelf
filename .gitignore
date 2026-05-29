@@ -1,0 +1,10 @@
+//
+//  .gitignore
+//  Hidden Shelf
+//
+//  Created by student on 29/05/26.
+//
+
+xcuserdata/
+*.xcuserstate
+Hidden Shelf.xcodeproj/project.xcworkspace/xcuserdata/student.xcuserdatad/UserInterfaceState.xcuserstate
