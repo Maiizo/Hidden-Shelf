@@ -6,6 +6,13 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		3F73334C2FC9787400DC4C2D /* FirebaseAuth in Frameworks */ = {isa = PBXBuildFile; productRef = 3F73334B2FC9787400DC4C2D /* FirebaseAuth */; };
+		3F73334E2FC9787400DC4C2D /* FirebaseCore in Frameworks */ = {isa = PBXBuildFile; productRef = 3F73334D2FC9787400DC4C2D /* FirebaseCore */; };
+		3F7333502FC9787400DC4C2D /* FirebaseFirestore in Frameworks */ = {isa = PBXBuildFile; productRef = 3F73334F2FC9787400DC4C2D /* FirebaseFirestore */; };
+		3F7333522FC9788A00DC4C2D /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 3F7333512FC9788A00DC4C2D /* GoogleService-Info.plist */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXContainerItemProxy section */
 		3F7330E62FC922B800DC4C2D /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -27,6 +34,7 @@
 		3F7330D82FC922B700DC4C2D /* Hidden Shelf.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Hidden Shelf.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		3F7330E52FC922B800DC4C2D /* Hidden ShelfTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "Hidden ShelfTests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		3F7330EF2FC922B800DC4C2D /* Hidden ShelfUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "Hidden ShelfUITests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
+		3F7333512FC9788A00DC4C2D /* GoogleService-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -52,6 +60,9 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				3F73334E2FC9787400DC4C2D /* FirebaseCore in Frameworks */,
+				3F73334C2FC9787400DC4C2D /* FirebaseAuth in Frameworks */,
+				3F7333502FC9787400DC4C2D /* FirebaseFirestore in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -79,6 +90,7 @@
 				3F7330E82FC922B800DC4C2D /* Hidden ShelfTests */,
 				3F7330F22FC922B800DC4C2D /* Hidden ShelfUITests */,
 				3F7330D92FC922B700DC4C2D /* Products */,
+				3F7333512FC9788A00DC4C2D /* GoogleService-Info.plist */,
 			);
 			sourceTree = "<group>";
 		};
@@ -112,6 +124,9 @@
 			);
 			name = "Hidden Shelf";
 			packageProductDependencies = (
+				3F73334B2FC9787400DC4C2D /* FirebaseAuth */,
+				3F73334D2FC9787400DC4C2D /* FirebaseCore */,
+				3F73334F2FC9787400DC4C2D /* FirebaseFirestore */,
 			);
 			productName = "Hidden Shelf";
 			productReference = 3F7330D82FC922B700DC4C2D /* Hidden Shelf.app */;
@@ -195,6 +210,9 @@
 			);
 			mainGroup = 3F7330CF2FC922B600DC4C2D;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				3F73334A2FC9787400DC4C2D /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */,
+			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 3F7330D92FC922B700DC4C2D /* Products */;
 			projectDirPath = "";
@@ -212,6 +230,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				3F7333522FC9788A00DC4C2D /* GoogleService-Info.plist in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -570,6 +589,35 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		3F73334A2FC9787400DC4C2D /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/firebase/firebase-ios-sdk";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 12.14.0;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		3F73334B2FC9787400DC4C2D /* FirebaseAuth */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 3F73334A2FC9787400DC4C2D /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseAuth;
+		};
+		3F73334D2FC9787400DC4C2D /* FirebaseCore */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 3F73334A2FC9787400DC4C2D /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseCore;
+		};
+		3F73334F2FC9787400DC4C2D /* FirebaseFirestore */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 3F73334A2FC9787400DC4C2D /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseFirestore;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 3F7330D02FC922B600DC4C2D /* Project object */;
 }
