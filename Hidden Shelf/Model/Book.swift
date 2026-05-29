@@ -4,6 +4,7 @@
 //
 //  Created by student on 29/05/26.
 //
+//
 
 import Foundation
 
@@ -18,6 +19,10 @@ struct Book: Identifiable, Codable {
     let coverUrl: String?
     var status: ShelfStatus
     let dateAdded: Date      // Added: Track system creation timestamp for sorting
+    var city: String
+    var isAvailable: Bool
+    var ownerId: String
+
 }
 
 struct OpenLibraryResponse: Codable {
