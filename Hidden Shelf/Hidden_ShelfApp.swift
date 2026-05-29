@@ -11,7 +11,7 @@ import SwiftUI
 struct Hidden_ShelfApp: App {
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            MyShelfView()
         }
     }
 }
