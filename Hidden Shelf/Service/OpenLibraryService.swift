@@ -4,7 +4,6 @@
 //
 //  Created by student on 29/05/26.
 //
-
 import Foundation
 
 class OpenLibraryService {
@@ -14,10 +13,9 @@ class OpenLibraryService {
         let sanitizedQuery = query.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? ""
         let urlString = "https://openlibrary.org/search.json?q=\(sanitizedQuery)&limit=7"
         
-        // FIXED: Using standard native URL(string:) initializer
         guard let url = URL(string: urlString) else {
-            throw URLError(.badURL)
-        }
+                    throw URLError(.badURL)
+                }
         
         let (data, response) = try await URLSession.shared.data(from: url)
         

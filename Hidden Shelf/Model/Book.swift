@@ -12,12 +12,14 @@ struct Book: Identifiable, Codable {
     let title: String
     let author: String
     let genre: String
+    let publisher: String    // Added: Penerbit
+    let pageCount: Int       // Added: Jumlah Halaman
     let quote: String
     let coverUrl: String?
     var status: ShelfStatus
+    let dateAdded: Date      // Added: Track system creation timestamp for sorting
 }
 
-// OpenLibrary API Mapping Models
 struct OpenLibraryResponse: Codable {
     let docs: [OpenLibraryDoc]
 }
@@ -29,13 +31,23 @@ struct OpenLibraryDoc: Codable, Identifiable {
     let author_name: [String]?
     let cover_i: Int?
     let subject: [String]?
+    let publisher: [String]?                  // Added: Map network array strings
+    let number_of_pages_median: Int?          // Added: Map network median integer page layout
     
     var firstAuthor: String {
         author_name?.first ?? "Unknown Author"
     }
     
     var firstGenre: String {
-        subject?.first ?? "Fiction"
+        subject?.first ?? "General"
+    }
+    
+    var firstPublisher: String {
+        publisher?.first ?? "Unknown Publisher"
+    }
+    
+    var totalPages: Int {
+        number_of_pages_median ?? 0
     }
     
     var formattedCoverUrl: String? {
