@@ -22,7 +22,6 @@ struct Book: Identifiable, Codable {
     var city: String
     var isAvailable: Bool
     var ownerId: String
-
 }
 
 struct OpenLibraryResponse: Codable {
