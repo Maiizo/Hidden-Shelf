@@ -78,7 +78,7 @@ struct MysteryBookCard: View {
                 HStack(spacing: 4) {
                     Image(systemName: "doc.text")
                         .font(.caption)
-                    Text("\(book.pages) pages")
+                    Text("\(book.pageCount) pages")
                         .font(.caption)
                         .lineLimit(1) // Memastikan teks halaman tetap 1 baris aman
                 }
@@ -144,27 +144,3 @@ struct MysteryBookCard: View {
     }
 }
 
-// Preview area tetap aman di baris akhir
-#Preview {
-    MysteryBookCard(
-        book: Book(
-            id: "dummy_1",
-            title: "Mystery Novel",
-            author: "Unknown author",
-            genre: "Philosophy",
-            pages: 320,
-            publisher: "Vintage Books",
-            quote: "In the depths of winter, I finally learned that within me there lay an invincible summer.",
-            city: "Surabaya",
-            isAvailable: true,
-            ownerId: "dummy_owner"
-        ),
-        onSkip: {
-            print("Tombol skip ditekan di preview")
-        },
-        onRequestSwap: {
-            print("Tombol request swap ditekan di preview")
-        }
-    )
-    .padding()
-}

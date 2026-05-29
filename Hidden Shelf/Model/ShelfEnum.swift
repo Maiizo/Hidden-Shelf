@@ -7,7 +7,6 @@
 
 import Foundation
 
-
 enum ViewMode {
     case card
     case list

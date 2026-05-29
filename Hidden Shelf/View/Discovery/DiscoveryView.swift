@@ -171,11 +171,3 @@ struct DiscoveryView: View {
     }
 }
 
-#Preview {
-    let dummyBooks = [
-        Book(id: "dummy_book_1", title: "The Republic", author: "Plato", genre: "Philosophy", pages: 416, publisher: "Penguin Classics", quote: "The measure of a man is what he does with power.", city: "Surabaya", isAvailable: true, ownerId: "user_edson"),
-        Book(id: "dummy_book_2", title: "Pride and Prejudice", author: "Jane Austen", genre: "Classic", pages: 279, publisher: "Modern Library", quote: "An unhappy alternative is before you, Elizabeth.", city: "Jakarta", isAvailable: true, ownerId: "user_eileen"),
-        Book(id: "dummy_book_3", title: "Dune", author: "Frank Herbert", genre: "Sci-Fi", pages: 120, publisher: "Chilton Books", quote: "Fear is the mind-killer.", city: "Surabaya", isAvailable: true, ownerId: "user_chelse")
-    ]
-    return DiscoveryView(previewBooks: dummyBooks)
-}

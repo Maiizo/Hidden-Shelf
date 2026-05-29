@@ -19,11 +19,15 @@ class FirebaseDBService {
                 completion(nil, error)
                 return
             }
-            // Mapping dokumen Firestore ke model Book
+            
+            // Mapping dokumen Firestore ke model Book secara otomatis via Codable
             let books = snapshot?.documents.compactMap { doc -> Book? in
-                var book = try? doc.data(as: Book.self)
-                book?.id = doc.documentID
-                return book
+                do {
+                    return try doc.data(as: Book.self)
+                } catch {
+                    print("Gagal decode buku: \(error.localizedDescription)")
+                    return nil
+                }
             }
             completion(books, nil)
         }
