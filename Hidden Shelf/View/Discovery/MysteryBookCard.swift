@@ -13,8 +13,8 @@ struct MysteryBookCard: View {
     var onRequestSwap: () -> Void
     
     var body: some View {
-        VStack(spacing: 20) {
-            // Header Card
+        VStack(spacing: 18) {
+            // 1. HEADER CARD: Bersih tanpa maskot di kanan atas
             HStack {
                 Image(systemName: "book")
                     .foregroundColor(Theme.matcha)
@@ -22,41 +22,49 @@ struct MysteryBookCard: View {
                     .font(.system(.subheadline, design: .serif))
                     .foregroundColor(Theme.carob.opacity(0.8))
                 Spacer()
-                // Tempat meletakkan maskot imut di pojok kanan atas kartu (Menggunakan Dummy)
-                Image("dummy_mascot_mini")
-                    .resizable()
-                    .scaledToFit()
-                    .frame(width: 35, height: 35)
-                    .clipShape(Circle())
             }
             .padding(.horizontal, 5)
             
-            // Quote Section
-            VStack(alignment: .leading, spacing: 8) {
-                Text("“")
-                    .font(.system(size: 40, design: .serif))
-                    .foregroundColor(Theme.chai)
-                    .frame(height: 15)
+            // 2. KOTAK UTAMA: Maskot di Sisi Kiri & Quote di Sisi Kanan
+            HStack(alignment: .center, spacing: 16) {
+                // Gambar Maskot ditaruh di kiri quote dengan ukuran proporsional
+                Image("Hahoh")
+                    .resizable()
+                    .scaledToFit()
+                    .frame(width: 70, height: 100)
+                    .clipShape(RoundedRectangle(cornerRadius: 12))
                 
-                Text(book.quote)
-                    .font(.system(.body, design: .serif))
-                    .italic()
-                    .foregroundColor(Theme.carob)
-                    .lineSpacing(4)
-                    .multilineTextAlignment(.leading)
-                    .padding(.horizontal, 10)
-                
-                HStack {
-                    Spacer()
-                    Text("”")
-                        .font(.system(size: 40, design: .serif))
+                // Isi Quote Section
+                VStack(alignment: .leading, spacing: 4) {
+                    Text("“")
+                        .font(.system(size: 35, design: .serif))
                         .foregroundColor(Theme.chai)
+                        .frame(height: 12)
+                    
+                    Text(book.quote)
+                        .font(.system(.body, design: .serif))
+                        .italic()
+                        .foregroundColor(Theme.carob)
+                        .lineSpacing(4)
+                        .multilineTextAlignment(.leading)
+                        .padding(.horizontal, 5)
+                        // 👇 INI MANDALANYA: Memaksa teks memanjang ke bawah dan melarang pemotongan elipsis horizontal
+                        .fixedSize(horizontal: false, vertical: true)
+                    
+                    HStack {
+                        Spacer()
+                        Text("”")
+                            .font(.system(size: 35, design: .serif))
+                            .foregroundColor(Theme.chai)
+                    }
+                    .frame(height: 12)
                 }
-                .frame(height: 15)
             }
+            .padding(.vertical, 5)
             
-            // Tags/Badges info (Genre, Halaman, Penerbit)
+            // 3. TAGS & BADGES (Genre & Halaman)
             HStack(spacing: 8) {
+                // Genre Tag
                 Text(book.genre)
                     .font(.caption)
                     .bold()
@@ -66,11 +74,13 @@ struct MysteryBookCard: View {
                     .cornerRadius(15)
                     .foregroundColor(Theme.carob)
                 
+                // Pages Tag (Dipaksa 1 Line Saja)
                 HStack(spacing: 4) {
                     Image(systemName: "doc.text")
                         .font(.caption)
                     Text("\(book.pages) pages")
                         .font(.caption)
+                        .lineLimit(1) // Memastikan teks halaman tetap 1 baris aman
                 }
                 .padding(.vertical, 6)
                 .padding(.horizontal, 12)
@@ -78,15 +88,21 @@ struct MysteryBookCard: View {
                 .cornerRadius(15)
                 .foregroundColor(Theme.carob)
                 
-                Text(book.publisher)
-                    .font(.caption)
-                    .foregroundColor(Theme.carob.opacity(0.7))
-                
                 Spacer()
             }
-            .padding(.top, 10)
+            .padding(.top, 5)
             
-            // Action Buttons (Skip & Request Swap)
+            // 4. PUBLISHER: Sekarang dipindah paling bawah sebelum tombol aksi
+            HStack {
+                Text("Published by: \(book.publisher)")
+                    .font(.system(size: 12))
+                    .foregroundColor(Theme.carob.opacity(0.6))
+                Spacer()
+            }
+            .padding(.horizontal, 5)
+            .padding(.top, 2)
+            
+            // 5. ACTION BUTTONS (Skip & Request Swap)
             HStack(spacing: 15) {
                 Button(action: onSkip) {
                     HStack {
@@ -116,7 +132,7 @@ struct MysteryBookCard: View {
                     .shadow(color: Theme.matcha.opacity(0.3), radius: 5, x: 0, y: 3)
                 }
             }
-            .padding(.top, 10)
+            .padding(.top, 8)
         }
         .padding(24)
         .background(Theme.vanilla.opacity(0.3))
@@ -126,4 +142,29 @@ struct MysteryBookCard: View {
                 .stroke(Theme.almond, lineWidth: 1)
         )
     }
+}
+
+// Preview area tetap aman di baris akhir
+#Preview {
+    MysteryBookCard(
+        book: Book(
+            id: "dummy_1",
+            title: "Mystery Novel",
+            author: "Unknown author",
+            genre: "Philosophy",
+            pages: 320,
+            publisher: "Vintage Books",
+            quote: "In the depths of winter, I finally learned that within me there lay an invincible summer.",
+            city: "Surabaya",
+            isAvailable: true,
+            ownerId: "dummy_owner"
+        ),
+        onSkip: {
+            print("Tombol skip ditekan di preview")
+        },
+        onRequestSwap: {
+            print("Tombol request swap ditekan di preview")
+        }
+    )
+    .padding()
 }

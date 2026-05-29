@@ -8,81 +8,77 @@
 import WidgetKit
 import SwiftUI
 
-struct Provider: AppIntentTimelineProvider {
+struct Provider: TimelineProvider {
     func placeholder(in context: Context) -> SimpleEntry {
-        SimpleEntry(date: Date(), configuration: ConfigurationAppIntent())
+        SimpleEntry(date: Date(), quote: "In the depths of winter, I finally learned...", genre: "Philosophy")
     }
 
-    func snapshot(for configuration: ConfigurationAppIntent, in context: Context) async -> SimpleEntry {
-        SimpleEntry(date: Date(), configuration: configuration)
+    func getSnapshot(in context: Context, completion: @escaping (SimpleEntry) -> ()) {
+        let entry = SimpleEntry(date: Date(), quote: "Read to live, not live to read.", genre: "Classic")
+        completion(entry)
     }
-    
-    func timeline(for configuration: ConfigurationAppIntent, in context: Context) async -> Timeline<SimpleEntry> {
-        var entries: [SimpleEntry] = []
 
-        // Generate a timeline consisting of five entries an hour apart, starting from the current date.
+    func getTimeline(in context: Context, completion: @escaping (Timeline<Entry>) -> ()) {
         let currentDate = Date()
-        for hourOffset in 0 ..< 5 {
-            let entryDate = Calendar.current.date(byAdding: .hour, value: hourOffset, to: currentDate)!
-            let entry = SimpleEntry(date: entryDate, configuration: configuration)
-            entries.append(entry)
-        }
-
-        return Timeline(entries: entries, policy: .atEnd)
+        // Mengatur siklus pembaruan Widget setiap 2 jam sekali
+        let refreshDate = Calendar.current.date(byAdding: .hour, value: 2, to: currentDate)!
+        
+        let entry = SimpleEntry(date: currentDate, quote: "The secret of getting ahead is getting started.", genre: "Fiction")
+        let timeline = Timeline(entries: [entry], policy: .atEnd)
+        completion(timeline)
     }
-
-//    func relevances() async -> WidgetRelevances<ConfigurationAppIntent> {
-//        // Generate a list containing the contexts this widget is relevant in.
-//    }
 }
 
 struct SimpleEntry: TimelineEntry {
     let date: Date
-    let configuration: ConfigurationAppIntent
+    let quote: String
+    let genre: String
 }
 
 struct HiddenShelfWidgetEntryView : View {
     var entry: Provider.Entry
 
     var body: some View {
-        VStack {
-            Text("Time:")
-            Text(entry.date, style: .time)
-
-            Text("Favorite Emoji:")
-            Text(entry.configuration.favoriteEmoji)
+        VStack(alignment: .leading, spacing: 8) {
+            HStack {
+                Text("📚 Hidden Shelf Quote")
+                    .font(.caption2)
+                    .bold()
+                    .foregroundColor(Theme.carob)
+                Spacer()
+            }
+            
+            Text("\"\(entry.quote)\"")
+                .font(.system(.footnote, design: .serif))
+                .italic()
+                .foregroundColor(Theme.carob)
+                .lineLimit(3)
+            
+            Spacer()
+            
+            Text(entry.genre)
+                .font(.system(size: 9))
+                .padding(.vertical, 3)
+                .padding(.horizontal, 8)
+                .background(Color(hex: "809671").opacity(0.2))
+                .cornerRadius(8)
+                .foregroundColor(Theme.carob)
         }
+        .padding()
+        .background(Theme.almond) // Warna Almond global
     }
 }
 
+@main
 struct HiddenShelfWidget: Widget {
     let kind: String = "HiddenShelfWidget"
 
     var body: some WidgetConfiguration {
-        AppIntentConfiguration(kind: kind, intent: ConfigurationAppIntent.self, provider: Provider()) { entry in
+        StaticConfiguration(kind: kind, provider: Provider()) { entry in
             HiddenShelfWidgetEntryView(entry: entry)
-                .containerBackground(.fill.tertiary, for: .widget)
         }
+        .configurationDisplayName("Hidden Shelf Daily Quote")
+        .description("Menampilkan kutipan buku misteri dari pengguna sekitar secara acak.")
+        .supportedFamilies([.systemSmall, .systemMedium])
     }
-}
-
-extension ConfigurationAppIntent {
-    fileprivate static var smiley: ConfigurationAppIntent {
-        let intent = ConfigurationAppIntent()
-        intent.favoriteEmoji = "😀"
-        return intent
-    }
-    
-    fileprivate static var starEyes: ConfigurationAppIntent {
-        let intent = ConfigurationAppIntent()
-        intent.favoriteEmoji = "🤩"
-        return intent
-    }
-}
-
-#Preview(as: .systemSmall) {
-    HiddenShelfWidget()
-} timeline: {
-    SimpleEntry(date: .now, configuration: .smiley)
-    SimpleEntry(date: .now, configuration: .starEyes)
 }

@@ -7,21 +7,21 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		3F45E4732FC92E3500CB8E0F /* GoogleService-Info (2).plist in Resources */ = {isa = PBXBuildFile; fileRef = 3F45E4722FC92E3500CB8E0F /* GoogleService-Info (2).plist */; };
+		3F45E4732FC92E3500CB8E0F /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 3F45E4722FC92E3500CB8E0F /* GoogleService-Info.plist */; };
 		3F45E4762FC92EF300CB8E0F /* FirebaseAnalytics in Frameworks */ = {isa = PBXBuildFile; productRef = 3F45E4752FC92EF300CB8E0F /* FirebaseAnalytics */; };
 		3F45E4782FC92EF300CB8E0F /* FirebaseAuth in Frameworks */ = {isa = PBXBuildFile; productRef = 3F45E4772FC92EF300CB8E0F /* FirebaseAuth */; };
 		3F45E47A2FC92EF300CB8E0F /* FirebaseFirestore in Frameworks */ = {isa = PBXBuildFile; productRef = 3F45E4792FC92EF300CB8E0F /* FirebaseFirestore */; };
-		3F45E4852FC9349F00CB8E0F /* WidgetKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3F45E4842FC9349F00CB8E0F /* WidgetKit.framework */; };
-		3F45E4872FC9349F00CB8E0F /* SwiftUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3F45E4862FC9349F00CB8E0F /* SwiftUI.framework */; };
-		3F45E4982FC934A100CB8E0F /* HiddenShelfWidgetExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 3F45E4822FC9349F00CB8E0F /* HiddenShelfWidgetExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		3F45E4A42FC9382B00CB8E0F /* WidgetKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3F45E4A32FC9382B00CB8E0F /* WidgetKit.framework */; };
+		3F45E4A52FC9382B00CB8E0F /* SwiftUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3F45E4862FC9349F00CB8E0F /* SwiftUI.framework */; };
+		3F45E4B62FC9382D00CB8E0F /* HiddenShelfWidgetExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 3F45E4A22FC9382B00CB8E0F /* HiddenShelfWidgetExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
-		3F45E4962FC934A100CB8E0F /* PBXContainerItemProxy */ = {
+		3F45E4B42FC9382D00CB8E0F /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 3F7330D02FC922B600DC4C2D /* Project object */;
 			proxyType = 1;
-			remoteGlobalIDString = 3F45E4812FC9349F00CB8E0F;
+			remoteGlobalIDString = 3F45E4A12FC9382B00CB8E0F;
 			remoteInfo = HiddenShelfWidgetExtension;
 		};
 		3F7330E62FC922B800DC4C2D /* PBXContainerItemProxy */ = {
@@ -47,7 +47,7 @@
 			dstPath = "";
 			dstSubfolderSpec = 13;
 			files = (
-				3F45E4982FC934A100CB8E0F /* HiddenShelfWidgetExtension.appex in Embed Foundation Extensions */,
+				3F45E4B62FC9382D00CB8E0F /* HiddenShelfWidgetExtension.appex in Embed Foundation Extensions */,
 			);
 			name = "Embed Foundation Extensions";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -55,36 +55,47 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		3F45E4722FC92E3500CB8E0F /* GoogleService-Info (2).plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "GoogleService-Info (2).plist"; sourceTree = "<group>"; };
-		3F45E4822FC9349F00CB8E0F /* HiddenShelfWidgetExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = HiddenShelfWidgetExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
-		3F45E4842FC9349F00CB8E0F /* WidgetKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WidgetKit.framework; path = System/Library/Frameworks/WidgetKit.framework; sourceTree = SDKROOT; };
+		3F45E4722FC92E3500CB8E0F /* GoogleService-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		3F45E4862FC9349F00CB8E0F /* SwiftUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SwiftUI.framework; path = System/Library/Frameworks/SwiftUI.framework; sourceTree = SDKROOT; };
+		3F45E4A22FC9382B00CB8E0F /* HiddenShelfWidgetExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = HiddenShelfWidgetExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+		3F45E4A32FC9382B00CB8E0F /* WidgetKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WidgetKit.framework; path = System/Library/Frameworks/WidgetKit.framework; sourceTree = SDKROOT; };
 		3F7330D82FC922B700DC4C2D /* Hidden Shelf.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Hidden Shelf.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		3F7330E52FC922B800DC4C2D /* Hidden ShelfTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "Hidden ShelfTests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		3F7330EF2FC922B800DC4C2D /* Hidden ShelfUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "Hidden ShelfUITests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
-		3F45E4992FC934A100CB8E0F /* Exceptions for "HiddenShelfWidget" folder in "HiddenShelfWidgetExtension" target */ = {
+		3F45E4B72FC9382D00CB8E0F /* Exceptions for "HiddenShelfWidget" folder in "HiddenShelfWidgetExtension" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
 				Info.plist,
 			);
-			target = 3F45E4812FC9349F00CB8E0F /* HiddenShelfWidgetExtension */;
+			target = 3F45E4A12FC9382B00CB8E0F /* HiddenShelfWidgetExtension */;
+		};
+		3F45E4BC2FC938CF00CB8E0F /* Exceptions for "Hidden Shelf" folder in "HiddenShelfWidgetExtension" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Model/Book.swift,
+				Theme.swift,
+			);
+			target = 3F45E4A12FC9382B00CB8E0F /* HiddenShelfWidgetExtension */;
 		};
 /* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
-		3F45E4882FC9349F00CB8E0F /* HiddenShelfWidget */ = {
+		3F45E4A62FC9382B00CB8E0F /* HiddenShelfWidget */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			exceptions = (
-				3F45E4992FC934A100CB8E0F /* Exceptions for "HiddenShelfWidget" folder in "HiddenShelfWidgetExtension" target */,
+				3F45E4B72FC9382D00CB8E0F /* Exceptions for "HiddenShelfWidget" folder in "HiddenShelfWidgetExtension" target */,
 			);
 			path = HiddenShelfWidget;
 			sourceTree = "<group>";
 		};
 		3F7330DA2FC922B700DC4C2D /* Hidden Shelf */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				3F45E4BC2FC938CF00CB8E0F /* Exceptions for "Hidden Shelf" folder in "HiddenShelfWidgetExtension" target */,
+			);
 			path = "Hidden Shelf";
 			sourceTree = "<group>";
 		};
@@ -101,12 +112,12 @@
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
-		3F45E47F2FC9349F00CB8E0F /* Frameworks */ = {
+		3F45E49F2FC9382B00CB8E0F /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				3F45E4872FC9349F00CB8E0F /* SwiftUI.framework in Frameworks */,
-				3F45E4852FC9349F00CB8E0F /* WidgetKit.framework in Frameworks */,
+				3F45E4A52FC9382B00CB8E0F /* SwiftUI.framework in Frameworks */,
+				3F45E4A42FC9382B00CB8E0F /* WidgetKit.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -140,8 +151,8 @@
 		3F45E4832FC9349F00CB8E0F /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
-				3F45E4842FC9349F00CB8E0F /* WidgetKit.framework */,
 				3F45E4862FC9349F00CB8E0F /* SwiftUI.framework */,
+				3F45E4A32FC9382B00CB8E0F /* WidgetKit.framework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -152,10 +163,10 @@
 				3F7330DA2FC922B700DC4C2D /* Hidden Shelf */,
 				3F7330E82FC922B800DC4C2D /* Hidden ShelfTests */,
 				3F7330F22FC922B800DC4C2D /* Hidden ShelfUITests */,
-				3F45E4882FC9349F00CB8E0F /* HiddenShelfWidget */,
+				3F45E4A62FC9382B00CB8E0F /* HiddenShelfWidget */,
 				3F45E4832FC9349F00CB8E0F /* Frameworks */,
 				3F7330D92FC922B700DC4C2D /* Products */,
-				3F45E4722FC92E3500CB8E0F /* GoogleService-Info (2).plist */,
+				3F45E4722FC92E3500CB8E0F /* GoogleService-Info.plist */,
 			);
 			sourceTree = "<group>";
 		};
@@ -165,7 +176,7 @@
 				3F7330D82FC922B700DC4C2D /* Hidden Shelf.app */,
 				3F7330E52FC922B800DC4C2D /* Hidden ShelfTests.xctest */,
 				3F7330EF2FC922B800DC4C2D /* Hidden ShelfUITests.xctest */,
-				3F45E4822FC9349F00CB8E0F /* HiddenShelfWidgetExtension.appex */,
+				3F45E4A22FC9382B00CB8E0F /* HiddenShelfWidgetExtension.appex */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -173,26 +184,26 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		3F45E4812FC9349F00CB8E0F /* HiddenShelfWidgetExtension */ = {
+		3F45E4A12FC9382B00CB8E0F /* HiddenShelfWidgetExtension */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 3F45E49A2FC934A100CB8E0F /* Build configuration list for PBXNativeTarget "HiddenShelfWidgetExtension" */;
+			buildConfigurationList = 3F45E4B82FC9382D00CB8E0F /* Build configuration list for PBXNativeTarget "HiddenShelfWidgetExtension" */;
 			buildPhases = (
-				3F45E47E2FC9349F00CB8E0F /* Sources */,
-				3F45E47F2FC9349F00CB8E0F /* Frameworks */,
-				3F45E4802FC9349F00CB8E0F /* Resources */,
+				3F45E49E2FC9382B00CB8E0F /* Sources */,
+				3F45E49F2FC9382B00CB8E0F /* Frameworks */,
+				3F45E4A02FC9382B00CB8E0F /* Resources */,
 			);
 			buildRules = (
 			);
 			dependencies = (
 			);
 			fileSystemSynchronizedGroups = (
-				3F45E4882FC9349F00CB8E0F /* HiddenShelfWidget */,
+				3F45E4A62FC9382B00CB8E0F /* HiddenShelfWidget */,
 			);
 			name = HiddenShelfWidgetExtension;
 			packageProductDependencies = (
 			);
 			productName = HiddenShelfWidgetExtension;
-			productReference = 3F45E4822FC9349F00CB8E0F /* HiddenShelfWidgetExtension.appex */;
+			productReference = 3F45E4A22FC9382B00CB8E0F /* HiddenShelfWidgetExtension.appex */;
 			productType = "com.apple.product-type.app-extension";
 		};
 		3F7330D72FC922B700DC4C2D /* Hidden Shelf */ = {
@@ -207,7 +218,7 @@
 			buildRules = (
 			);
 			dependencies = (
-				3F45E4972FC934A100CB8E0F /* PBXTargetDependency */,
+				3F45E4B52FC9382D00CB8E0F /* PBXTargetDependency */,
 			);
 			fileSystemSynchronizedGroups = (
 				3F7330DA2FC922B700DC4C2D /* Hidden Shelf */,
@@ -278,7 +289,7 @@
 				LastSwiftUpdateCheck = 2650;
 				LastUpgradeCheck = 2650;
 				TargetAttributes = {
-					3F45E4812FC9349F00CB8E0F = {
+					3F45E4A12FC9382B00CB8E0F = {
 						CreatedOnToolsVersion = 26.5;
 					};
 					3F7330D72FC922B700DC4C2D = {
@@ -314,13 +325,13 @@
 				3F7330D72FC922B700DC4C2D /* Hidden Shelf */,
 				3F7330E42FC922B800DC4C2D /* Hidden ShelfTests */,
 				3F7330EE2FC922B800DC4C2D /* Hidden ShelfUITests */,
-				3F45E4812FC9349F00CB8E0F /* HiddenShelfWidgetExtension */,
+				3F45E4A12FC9382B00CB8E0F /* HiddenShelfWidgetExtension */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
-		3F45E4802FC9349F00CB8E0F /* Resources */ = {
+		3F45E4A02FC9382B00CB8E0F /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -331,7 +342,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				3F45E4732FC92E3500CB8E0F /* GoogleService-Info (2).plist in Resources */,
+				3F45E4732FC92E3500CB8E0F /* GoogleService-Info.plist in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -352,7 +363,7 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
-		3F45E47E2FC9349F00CB8E0F /* Sources */ = {
+		3F45E49E2FC9382B00CB8E0F /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -383,10 +394,10 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
-		3F45E4972FC934A100CB8E0F /* PBXTargetDependency */ = {
+		3F45E4B52FC9382D00CB8E0F /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = 3F45E4812FC9349F00CB8E0F /* HiddenShelfWidgetExtension */;
-			targetProxy = 3F45E4962FC934A100CB8E0F /* PBXContainerItemProxy */;
+			target = 3F45E4A12FC9382B00CB8E0F /* HiddenShelfWidgetExtension */;
+			targetProxy = 3F45E4B42FC9382D00CB8E0F /* PBXContainerItemProxy */;
 		};
 		3F7330E72FC922B800DC4C2D /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
@@ -401,7 +412,7 @@
 /* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
-		3F45E49B2FC934A100CB8E0F /* Debug */ = {
+		3F45E4B92FC9382D00CB8E0F /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
@@ -430,7 +441,7 @@
 			};
 			name = Debug;
 		};
-		3F45E49C2FC934A100CB8E0F /* Release */ = {
+		3F45E4BA2FC9382D00CB8E0F /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
@@ -723,11 +734,11 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		3F45E49A2FC934A100CB8E0F /* Build configuration list for PBXNativeTarget "HiddenShelfWidgetExtension" */ = {
+		3F45E4B82FC9382D00CB8E0F /* Build configuration list for PBXNativeTarget "HiddenShelfWidgetExtension" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				3F45E49B2FC934A100CB8E0F /* Debug */,
-				3F45E49C2FC934A100CB8E0F /* Release */,
+				3F45E4B92FC9382D00CB8E0F /* Debug */,
+				3F45E4BA2FC9382D00CB8E0F /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
