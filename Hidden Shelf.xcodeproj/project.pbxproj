@@ -14,6 +14,8 @@
 		3F45E4A42FC9382B00CB8E0F /* WidgetKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3F45E4A32FC9382B00CB8E0F /* WidgetKit.framework */; };
 		3F45E4A52FC9382B00CB8E0F /* SwiftUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3F45E4862FC9349F00CB8E0F /* SwiftUI.framework */; };
 		3F45E4B62FC9382D00CB8E0F /* HiddenShelfWidgetExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 3F45E4A22FC9382B00CB8E0F /* HiddenShelfWidgetExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		3F9800352FD006500077B918 /* FirebaseCore in Frameworks */ = {isa = PBXBuildFile; productRef = 3F9800342FD006500077B918 /* FirebaseCore */; };
+		3F9800372FD006540077B918 /* FirebaseFirestore in Frameworks */ = {isa = PBXBuildFile; productRef = 3F9800362FD006540077B918 /* FirebaseFirestore */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -72,10 +74,9 @@
 			);
 			target = 3F45E4A12FC9382B00CB8E0F /* HiddenShelfWidgetExtension */;
 		};
-		3F45E4BC2FC938CF00CB8E0F /* Exceptions for "Hidden Shelf" folder in "HiddenShelfWidgetExtension" target */ = {
+		3F9800392FD007C80077B918 /* Exceptions for "Hidden Shelf" folder in "HiddenShelfWidgetExtension" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
-				Model/Book.swift,
 				Theme.swift,
 			);
 			target = 3F45E4A12FC9382B00CB8E0F /* HiddenShelfWidgetExtension */;
@@ -94,7 +95,7 @@
 		3F7330DA2FC922B700DC4C2D /* Hidden Shelf */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			exceptions = (
-				3F45E4BC2FC938CF00CB8E0F /* Exceptions for "Hidden Shelf" folder in "HiddenShelfWidgetExtension" target */,
+				3F9800392FD007C80077B918 /* Exceptions for "Hidden Shelf" folder in "HiddenShelfWidgetExtension" target */,
 			);
 			path = "Hidden Shelf";
 			sourceTree = "<group>";
@@ -117,6 +118,8 @@
 			buildActionMask = 2147483647;
 			files = (
 				3F45E4A52FC9382B00CB8E0F /* SwiftUI.framework in Frameworks */,
+				3F9800372FD006540077B918 /* FirebaseFirestore in Frameworks */,
+				3F9800352FD006500077B918 /* FirebaseCore in Frameworks */,
 				3F45E4A42FC9382B00CB8E0F /* WidgetKit.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -201,6 +204,8 @@
 			);
 			name = HiddenShelfWidgetExtension;
 			packageProductDependencies = (
+				3F9800342FD006500077B918 /* FirebaseCore */,
+				3F9800362FD006540077B918 /* FirebaseFirestore */,
 			);
 			productName = HiddenShelfWidgetExtension;
 			productReference = 3F45E4A22FC9382B00CB8E0F /* HiddenShelfWidgetExtension.appex */;
@@ -804,6 +809,16 @@
 			productName = FirebaseAuth;
 		};
 		3F45E4792FC92EF300CB8E0F /* FirebaseFirestore */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 3F45E4742FC92EF300CB8E0F /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseFirestore;
+		};
+		3F9800342FD006500077B918 /* FirebaseCore */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 3F45E4742FC92EF300CB8E0F /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseCore;
+		};
+		3F9800362FD006540077B918 /* FirebaseFirestore */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = 3F45E4742FC92EF300CB8E0F /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
 			productName = FirebaseFirestore;

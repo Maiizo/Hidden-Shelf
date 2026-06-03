@@ -76,14 +76,14 @@ struct HiddenShelfWidgetEntryView : View {
                 // Ikon Petik Pembuka
                 Text("“")
                     .font(.system(size: 28, design: .serif))
-                    .foregroundColor(Color(hex: "725C3A").opacity(0.3))
+                    .foregroundColor(Color(Theme.carob).opacity(0.3))
                     .frame(height: 8)
                 
                 // Kutipan Buku (Quotes)
                 Text(entry.book.quote)
                     .font(.system(size: 12, weight: .medium, design: .serif))
                     .italic()
-                    .foregroundColor(Color(hex: "725C3A"))
+                    .foregroundColor(Color(Theme.carob))
                     .multilineTextAlignment(.leading)
                     .lineLimit(3) // Batasi 3 baris agar ruang muat untuk komponen lain
                     .padding(.horizontal, 12)
