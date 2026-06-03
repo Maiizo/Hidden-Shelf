@@ -1,1 +1,52 @@
-*.xcuserstate
+# Xcode
+#
+# Reference: https://github.com/github/gitignore/blob/main/Swift.gitignore
+
+# Build artifacts
+build/
+DerivedData/
+
+# Personal settings / User data
+*.pbxuser
+!default.pbxuser
+*.mode1v3
+!default.mode1v3
+*.mode2v3
+!default.mode2v3
+*.perspectivev3
+!default.perspectivev3
+xcuserdata/
+
+# Architecture independent files
+*.xccheckout
+*.xcworkspace/xcshareddata/WorkspaceSettings.xcsettings
+*.xcworkspace/xcuserdata/
+*.xcuserdatad/
+
+# Swift Package Manager
+#
+# Add this if you are using SPM
+.build/
+Packages/
+Package.pins
+Package.resolved
+# Note: Un-comment Package.resolved if you want to lock dependency versions in source control
+
+# CocoaPods
+#
+# Add this if you use Pods. 
+# Keeping Pods/ out of git is standard practice, but some teams prefer to commit them.
+Pods/
+CMakeLists.txt
+CMakeSettings.json
+
+# Fastlane
+fastlane/report.xml
+fastlane/Preview.html
+fastlane/screenshots/**/*.png
+fastlane/test_output
+
+# Miscellaneous
+.DS_Store
+*.swp
+*~
