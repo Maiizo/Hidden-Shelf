@@ -9,6 +9,7 @@
 import Foundation
 import MapKit
 import Combine
+import SwiftUI
 
 class MatchViewModel: ObservableObject {
     @Published var currentMatch: Match?
