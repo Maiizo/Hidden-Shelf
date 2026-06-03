@@ -15,8 +15,8 @@ struct LoginView: View {
     var body: some View {
         NavigationStack {
             ZStack {
-                // Background color
-                Color(hex: "E5E0D8")
+                // Background color - menggunakan Theme
+                Theme.almond
                     .ignoresSafeArea()
                 
                 ScrollView {
@@ -33,11 +33,11 @@ struct LoginView: View {
                             Text("Hidden Shelf")
                                 .font(.largeTitle)
                                 .fontWeight(.bold)
-                                .foregroundColor(Color(hex: "725C3A"))
+                                .foregroundColor(Theme.carob)
                             
                             Text("Discover your next mystery read")
                                 .font(.subheadline)
-                                .foregroundColor(Color(hex: "725C3A").opacity(0.7))
+                                .foregroundColor(Theme.carob.opacity(0.7))
                         }
                         
                         // Input fields
@@ -46,12 +46,12 @@ struct LoginView: View {
                             VStack(alignment: .leading, spacing: 8) {
                                 Text("Email")
                                     .font(.caption)
-                                    .foregroundColor(Color(hex: "725C3A"))
+                                    .foregroundColor(Theme.carob)
                                 TextField("your @email.com", text: $email)
                                     .padding()
-                                    .background(Color(hex: "E5D2B8"))
+                                    .background(Theme.vanilla)
                                     .cornerRadius(16)
-                                    .foregroundColor(Color(hex: "725C3A"))
+                                    .foregroundColor(Theme.carob)
                                     .textInputAutocapitalization(.never)
                                     .keyboardType(.emailAddress)
                             }
@@ -60,12 +60,12 @@ struct LoginView: View {
                             VStack(alignment: .leading, spacing: 8) {
                                 Text("Password")
                                     .font(.caption)
-                                    .foregroundColor(Color(hex: "725C3A"))
+                                    .foregroundColor(Theme.carob)
                                 SecureField("·············", text: $password)
                                     .padding()
-                                    .background(Color(hex: "E5D2B8"))
+                                    .background(Theme.vanilla)
                                     .cornerRadius(16)
-                                    .foregroundColor(Color(hex: "725C3A"))
+                                    .foregroundColor(Theme.carob)
                             }
                         }
                         .padding(.horizontal, 24)
@@ -79,7 +79,7 @@ struct LoginView: View {
                                 .fontWeight(.semibold)
                                 .frame(maxWidth: .infinity)
                                 .padding()
-                                .background(Color(hex: "809671"))
+                                .background(Theme.matcha)
                                 .foregroundColor(.white)
                                 .cornerRadius(16)
                         }
@@ -91,7 +91,7 @@ struct LoginView: View {
                         }) {
                             Text("Register a new account")
                                 .font(.subheadline)
-                                .foregroundColor(Color(hex: "D2AB80"))
+                                .foregroundColor(Theme.chai)
                                 .underline()
                         }
                         .padding(.bottom, 40)
