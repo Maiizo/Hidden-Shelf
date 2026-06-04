@@ -8,23 +8,24 @@
 import Foundation
 
 struct Book: Identifiable, Codable {
-    var id = UUID()          // Kembali menggunakan UUID sesuai kebutuhan tim
+    // ID lokal dibiarkan 'let' karena identitas asli buku tidak boleh berubah
+    let id: UUID
+    
+    // Atribut ini diubah menjadi 'var' agar bisa ditimpa saat fitur Edit disimpan
     var firestoreID: String?
-    let title: String
-    let author: String
-    let genre: String
-    let publisher: String    // Added: Penerbit
-    let pageCount: Int       // Added: Jumlah Halaman
-    let quote: String
-    let coverUrl: String?
+    var title: String
+    var author: String
+    var genre: String
+    var publisher: String
+    var pageCount: Int
+    var quote: String
+    var coverUrl: String?
     var isAvailable: Bool
     var ownerId: String
     var status: ShelfStatus
-    let dateAdded: Date      // Added: Track system creation timestamp for sorting
+    var dateAdded: Date
     
-    // PENYANGGA SEMENTARA:
-    // Menghubungkan filter pencarian kota dengan data default/mock.
-    // Nanti teman Anda bisa menghubungkannya dengan profil pemilik asli berdasarkan `ownerId`.
+    // Computed property city dikembalikan agar filter dan UI kamu tidak error
     var city: String {
         // Simulasi kota berbeda berdasarkan ownerId untuk testing filter:
         if ownerId == "user_jakarta" {

@@ -5,6 +5,7 @@
 //  Created by student on 29/05/26.
 //
 // MatchView.swift
+
 import SwiftUI
 import MapKit
 
@@ -13,63 +14,68 @@ struct MatchView: View {
     
     var body: some View {
         NavigationStack {
-            VStack(spacing: 0) {
-                if let match = viewModel.currentMatch {
-                    
-                    // 1. Modern iOS 17 Map Component
-                    Map(position: $viewModel.cameraPosition) {
-                        Marker("Meeting Point", coordinate: match.coordinate)
-                            .tint(.blue)
-                    }
-                    .frame(height: UIScreen.main.bounds.height * 0.45)
-                    
-                    // 2. The Status Tracker
-                    VStack(spacing: 20) {
-                        Text("Book Swap Progress")
-                            .font(.headline)
-                            .padding(.top)
+            ZStack {
+                Theme.almond.ignoresSafeArea() // Latar Themed
+                
+                VStack(spacing: 0) {
+                    if let match = viewModel.currentMatch {
                         
-                        HStack(spacing: 10) {
-                            StepIndicator(title: "On the Way", isActive: viewModel.statusStep >= 0)
-                            StepIndicator(title: "Arrived", isActive: viewModel.statusStep >= 1)
-                            StepIndicator(title: "Complete", isActive: viewModel.statusStep >= 2)
+                        // PETA
+                        Map(coordinateRegion: $viewModel.region, annotationItems: [match]) { location in
+                            MapMarker(coordinate: location.coordinate, tint: Theme.matcha)
                         }
-                        .padding(.horizontal)
+                        .frame(height: UIScreen.main.bounds.height * 0.45)
                         
-                        Text("Current Status: \(match.status)")
-                            .font(.subheadline)
-                            .foregroundColor(.secondary)
-                        
-                        // 3. Dynamic Action Button
-                        if viewModel.statusStep < 2 {
-                            Button(action: {
-                                viewModel.nextStep()
-                            }) {
-                                Text(viewModel.statusStep == 0 ? "I have Arrived" : "Finish Swapping")
-                                    .fontWeight(.bold)
-                                    .frame(maxWidth: .infinity)
-                                    .padding()
-                                    .background(Color.blue)
-                                    .foregroundColor(.white)
-                                    .cornerRadius(10)
+                        // STATUS TRACKER
+                        VStack(spacing: 20) {
+                            Text("Book Swap Progress")
+                                .font(.system(.headline, design: .serif))
+                                .foregroundColor(Theme.carob)
+                                .padding(.top)
+                            
+                            HStack(spacing: 10) {
+                                StepIndicator(title: "On the Way", isActive: viewModel.statusStep >= 0)
+                                StepIndicator(title: "Arrived", isActive: viewModel.statusStep >= 1)
+                                StepIndicator(title: "Complete", isActive: viewModel.statusStep >= 2)
                             }
                             .padding(.horizontal)
+                            
+                            Text("Current Status: \(match.status)")
+                                .font(.system(.subheadline, design: .serif))
+                                .foregroundColor(Theme.carob.opacity(0.8))
+                            
+                            // TOMBOL AKSI
+                            if viewModel.statusStep < 2 {
+                                Button(action: {
+                                    viewModel.nextStep()
+                                }) {
+                                    Text(viewModel.statusStep == 0 ? "I have Arrived" : "Finish Swapping")
+                                        .font(.system(.body, design: .serif))
+                                        .fontWeight(.bold)
+                                        .frame(maxWidth: .infinity)
+                                        .padding()
+                                        .background(Theme.matcha)
+                                        .foregroundColor(.white)
+                                        .cornerRadius(10)
+                                }
+                                .padding(.horizontal)
+                            }
                         }
+                        .padding()
+                        .background(Theme.vanilla)
+                        .cornerRadius(20)
+                        .shadow(color: Theme.carob.opacity(0.1), radius: 5)
+                        .offset(y: -20)
+                        
+                    } else {
+                        ContentUnavailableView("No Active Match", systemImage: "clock.arrow.circlepath")
                     }
-                    .padding()
-                    .background(Color(.systemBackground))
-                    .cornerRadius(20)
-                    .shadow(radius: 5)
-                    .offset(y: -20)
-                    
-                } else {
-                    ContentUnavailableView("No Active Match", systemImage: "clock.arrow.circlepath")
                 }
             }
             .navigationTitle("Titik Temu")
             .navigationBarTitleDisplayMode(.inline)
             
-            // 4. The Required Confirmation Alert
+            // ALERT POP-UP KONFIRMASI
             .alert("Confirm Swap Completion", isPresented: $viewModel.showConfirmationPopup) {
                 Button("Yes, Swap Complete", role: .none) {
                     viewModel.completeSwap()
@@ -84,7 +90,6 @@ struct MatchView: View {
     }
 }
 
-// Helper View for the Tracker
 struct StepIndicator: View {
     let title: String
     let isActive: Bool
@@ -92,17 +97,17 @@ struct StepIndicator: View {
     var body: some View {
         VStack {
             Rectangle()
-                .fill(isActive ? Color.blue : Color.gray.opacity(0.3))
+                .fill(isActive ? Theme.matcha : Theme.carob.opacity(0.2))
                 .frame(height: 6)
                 .cornerRadius(3)
             Text(title)
-                .font(.caption2)
-                .foregroundColor(isActive ? .primary : .secondary)
+                .font(.system(.caption2, design: .serif))
+                .foregroundColor(isActive ? Theme.carob : Theme.carob.opacity(0.6))
         }
     }
 }
 
-#Preview {
+#Preview
+{
     MatchView()
 }
-

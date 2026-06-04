@@ -14,72 +14,36 @@ struct FilterSheetView: View {
     var onClose: () -> Void = {}
     
     var body: some View {
-        VStack(alignment: .leading, spacing: 20) {
+        VStack(alignment: .leading, spacing: 16) {
             
-            // Header: Sekarang bersih tanpa tombol silang internal ganda
+            // Header
             HStack {
                 Text("Filters")
-                    .font(.system(.title2, design: .serif).bold())
+                    .font(.system(size: 16, weight: .bold, design: .serif))
                     .foregroundColor(Theme.carob)
                 Spacer()
             }
-            .padding(.bottom, 5)
             
-            // Form Dropdown Selector
-            VStack(spacing: 15) {
-                // Filter Genre
-                VStack(alignment: .leading, spacing: 8) {
-                    Text("Genre").font(.subheadline).foregroundColor(Theme.carob.opacity(0.7))
-                    Picker("Select Genre", selection: $viewModel.selectedGenre) {
-                        ForEach(viewModel.genres, id: \.self) { genre in
-                            Text(genre).tag(genre)
-                        }
-                    }
-                    .pickerStyle(.menu)
-                    .accentColor(Theme.carob)
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                    .padding(.horizontal, 12)
-                    .padding(.vertical, 4)
-                    .background(Color.white)
-                    .cornerRadius(12)
-                    .overlay(RoundedRectangle(cornerRadius: 12).stroke(Theme.almond, lineWidth: 1))
+            // Form Dropdown Selector (Style disamakan dengan MyShelfView)
+            VStack(spacing: 12) {
+                HStack(spacing: 12) {
+                    DiscoveryFilterDropdownMenu(
+                        label: "Genre",
+                        selection: $viewModel.selectedGenre,
+                        options: viewModel.genres
+                    )
+                    DiscoveryFilterDropdownMenu(
+                        label: "Page Count",
+                        selection: $viewModel.selectedPageCountRange,
+                        options: viewModel.pageRanges
+                    )
                 }
                 
-                // Filter Batasan Halaman
-                VStack(alignment: .leading, spacing: 8) {
-                    Text("Page Count").font(.subheadline).foregroundColor(Theme.carob.opacity(0.7))
-                    Picker("Select Page Count", selection: $viewModel.selectedPageCountRange) {
-                        ForEach(viewModel.pageRanges, id: \.self) { range in
-                            Text(range).tag(range)
-                        }
-                    }
-                    .pickerStyle(.menu)
-                    .accentColor(Theme.carob)
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                    .padding(.horizontal, 12)
-                    .padding(.vertical, 4)
-                    .background(Color.white)
-                    .cornerRadius(12)
-                    .overlay(RoundedRectangle(cornerRadius: 12).stroke(Theme.almond, lineWidth: 1))
-                }
-                
-                // Filter Regional Kota
-                VStack(alignment: .leading, spacing: 8) {
-                    Text("City Region").font(.subheadline).foregroundColor(Theme.carob.opacity(0.7))
-                    Picker("Select City", selection: $viewModel.selectedCity) {
-                        ForEach(viewModel.cities, id: \.self) { city in
-                            Text(city).tag(city)
-                        }
-                    }
-                    .pickerStyle(.menu)
-                    .accentColor(Theme.carob)
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                    .padding(.horizontal, 12)
-                    .padding(.vertical, 4)
-                    .background(Color.white)
-                    .cornerRadius(12)
-                    .overlay(RoundedRectangle(cornerRadius: 12).stroke(Theme.almond, lineWidth: 1))
-                }
+                DiscoveryFilterDropdownMenu(
+                    label: "City Region",
+                    selection: $viewModel.selectedCity,
+                    options: viewModel.cities
+                )
             }
             
             // Button Terapkan
@@ -91,20 +55,59 @@ struct FilterSheetView: View {
                 }
             }) {
                 Text("Apply Filters")
-                    .font(.headline)
+                    .font(.system(.subheadline, design: .serif))
+                    .fontWeight(.bold)
                     .foregroundColor(.white)
-                    .frame(maxWidth: .infinity)
-                    .frame(height: 50)
+                    .frame(maxWidth: .infinity, minHeight: 40)
                     .background(Theme.matcha)
-                    .cornerRadius(15)
+                    .cornerRadius(10)
                     .shadow(color: Theme.matcha.opacity(0.3), radius: 5, x: 0, y: 3)
             }
-            .padding(.top, 10)
+            .padding(.top, 4)
         }
-        .padding(24)
+        .padding(16)
         .background(Theme.vanilla)
-        .cornerRadius(24)
-        .shadow(color: Color.black.opacity(0.08), radius: 15, x: 0, y: 8)
+        .cornerRadius(16)
+        .shadow(color: Theme.carob.opacity(0.15), radius: 10, x: 0, y: 5)
+    }
+}
+
+// Komponen Reusable khusus untuk Discovery, meng-copy style persis dari MyShelfView
+struct DiscoveryFilterDropdownMenu: View {
+    let label: String
+    @Binding var selection: String
+    let options: [String]
+    
+    var body: some View {
+        VStack(alignment: .leading, spacing: 4) {
+            Text(label)
+                .font(.system(size: 10, weight: .bold, design: .serif))
+                .foregroundColor(Theme.carob)
+            
+            Menu {
+                Picker(label, selection: $selection) {
+                    ForEach(options, id: \.self) { opt in Text(opt).tag(opt) }
+                }
+            } label: {
+                HStack {
+                    Text(selection)
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.7)
+                    
+                    Spacer(minLength: 4)
+                    
+                    Image(systemName: "chevron.up.chevron.down")
+                        .font(.system(size: 10))
+                }
+                .font(.system(size: 13, weight: .medium, design: .serif))
+                .foregroundColor(Theme.carob)
+                .padding(.horizontal, 8)
+                .frame(maxWidth: .infinity, minHeight: 30)
+                .background(Theme.almond)
+                .cornerRadius(6)
+            }
+        }
+        .frame(maxWidth: .infinity)
     }
 }
 

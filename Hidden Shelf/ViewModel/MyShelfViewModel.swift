@@ -171,4 +171,40 @@ class MyShelfViewModel: ObservableObject {
                 }
             }
     }
+    // MASUKKAN FUNGSI INI DI DALAM CLASS MyShelfViewModel (di bagian paling bawah)
+        func updateBook(bookId: UUID, newTitle: String, newAuthor: String, newGenre: String, newPublisher: String, newPageCount: Int, newQuote: String) {
+            
+            // 1. Cari buku berdasarkan UUID lokal
+            if let index = self.shelfBooks.firstIndex(where: { $0.id == bookId }) {
+                
+                // 2. Update data lokal (Optimistic UI)
+                self.shelfBooks[index].title = newTitle
+                self.shelfBooks[index].author = newAuthor
+                self.shelfBooks[index].genre = newGenre
+                self.shelfBooks[index].publisher = newPublisher
+                self.shelfBooks[index].pageCount = newPageCount
+                self.shelfBooks[index].quote = newQuote
+               
+                // 3. Update ke database MENGGUNAKAN firestoreID
+                if let firestoreID = self.shelfBooks[index].firestoreID, !firestoreID.isEmpty {
+                    db.collection("books").document(firestoreID).updateData([
+                        "title": newTitle,
+                        "author": newAuthor,
+                        "genre": newGenre,
+                        "publisher": newPublisher,
+                        "pageCount": newPageCount,
+                        "quote": newQuote
+                    ]) { error in
+                        if let error = error {
+                            print("❌ Gagal update buku di Firebase: \(error.localizedDescription)")
+                        } else {
+                            print("✅ Buku berhasil diupdate di Firebase!")
+                        }
+                    }
+                } else {
+                    print("⚠️ Buku ini belum tersinkronisasi dengan Firestore (firestoreID kosong).")
+                }
+            }
+        }
+    
 }

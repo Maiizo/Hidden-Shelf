@@ -24,7 +24,7 @@ struct DiscoveryView: View {
         NavigationView {
             ZStack {
                 // Background utama
-                Color(hex: "E5E0D8").opacity(0.4).ignoresSafeArea()
+                Theme.almond.ignoresSafeArea()
                 
                 VStack(spacing: 0) {
                     
@@ -36,7 +36,7 @@ struct DiscoveryView: View {
                             }
                         })
                         .padding(.horizontal, 24)
-                        .padding(.top, 90) // 👈 FIX 1: Padding diperbesar agar aman dari Dynamic Island / Poni
+                        .padding(.top, 90) 
                         .padding(.bottom, 15)
                         .transition(.move(edge: .top).combined(with: .opacity))
                         .zIndex(2) // Memastikan filter selalu berada di layer teratas
@@ -55,7 +55,7 @@ struct DiscoveryView: View {
                             Image("Reading")
                                 .resizable()
                                 .scaledToFit()
-                                .frame(width: 85, height: 100)
+                                .frame(width: 50, height: 50)
                                 .background(
                                     Circle()
                                         .fill(Theme.pistache)
@@ -90,7 +90,7 @@ struct DiscoveryView: View {
                                 .background(
                                     Circle()
                                         .fill(Theme.pistache)
-                                        .frame(width: 80, height: 80)
+                                        .frame(width: 180, height: 180)
                                         .offset(y: 5)
                                 )
                             Text("No mystery books found around you.")
