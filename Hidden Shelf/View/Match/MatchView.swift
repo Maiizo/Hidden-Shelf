@@ -12,6 +12,9 @@ import MapKit
 struct MatchView: View {
     @StateObject private var viewModel = MatchViewModel()
     
+    // 💡 TAMBAHAN: Environment untuk menutup halaman
+    @Environment(\.dismiss) var dismiss
+    
     var body: some View {
         NavigationStack {
             ZStack {
@@ -20,11 +23,19 @@ struct MatchView: View {
                 VStack(spacing: 0) {
                     if let match = viewModel.currentMatch {
                         
-                        // PETA
-                        Map(coordinateRegion: $viewModel.region, annotationItems: [match]) { location in
-                            MapMarker(coordinate: location.coordinate, tint: Theme.matcha)
+                        // 🌍 PETA ADAPTIF (Bebas Warning)
+                        if #available(iOS 17.0, *) {
+                            Map(initialPosition: .region(viewModel.region)) {
+                                Marker("Meeting Point", coordinate: match.coordinate)
+                                    .tint(Theme.matcha)
+                            }
+                            .frame(height: UIScreen.main.bounds.height * 0.45)
+                        } else {
+                            Map(coordinateRegion: $viewModel.region, annotationItems: [match]) { location in
+                                MapMarker(coordinate: location.coordinate, tint: Theme.matcha)
+                            }
+                            .frame(height: UIScreen.main.bounds.height * 0.45)
                         }
-                        .frame(height: UIScreen.main.bounds.height * 0.45)
                         
                         // STATUS TRACKER
                         VStack(spacing: 20) {
@@ -68,12 +79,38 @@ struct MatchView: View {
                         .offset(y: -20)
                         
                     } else {
-                        ContentUnavailableView("No Active Match", systemImage: "clock.arrow.circlepath")
+                        // STANDARDIZED FALLBACK
+                        VStack(spacing: 16) {
+                            Image(systemName: "clock.arrow.circlepath")
+                                .font(.system(size: 50))
+                                .foregroundColor(Theme.carob.opacity(0.5))
+                            Text("No Active Match")
+                                .font(.system(.title2, design: .serif))
+                                .fontWeight(.semibold)
+                                .foregroundColor(Theme.carob)
+                        }
+                        .frame(maxWidth: .infinity, maxHeight: .infinity)
                     }
                 }
             }
             .navigationTitle("Titik Temu")
             .navigationBarTitleDisplayMode(.inline)
+            
+            // 💡 TAMBAHAN: Tombol Back Kustom
+            .toolbar {
+                ToolbarItem(placement: .navigationBarLeading) {
+                    Button(action: {
+                        dismiss() // Menutup layar MatchView
+                    }) {
+                        HStack(spacing: 4) {
+                            Image(systemName: "chevron.left")
+                                .fontWeight(.bold)
+                            Text("Kembali")
+                        }
+                        .foregroundColor(Theme.carob)
+                    }
+                }
+            }
             
             // ALERT POP-UP KONFIRMASI
             .alert("Confirm Swap Completion", isPresented: $viewModel.showConfirmationPopup) {
@@ -90,6 +127,7 @@ struct MatchView: View {
     }
 }
 
+// Helper View
 struct StepIndicator: View {
     let title: String
     let isActive: Bool

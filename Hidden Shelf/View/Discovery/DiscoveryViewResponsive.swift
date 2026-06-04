@@ -5,11 +5,21 @@
 //  Created by student on 29/05/26.
 //
 
+//
+//  DiscoveryView.swift
+//  Hidden Shelf
+//
+//  Created by student on 29/05/26.
+//
+
 import SwiftUI
 
 struct DiscoveryViewResponsive: View {
     @StateObject private var viewModel = DiscoveryViewModel()
     @State private var showFilterSheet = false
+    
+    // 💡 STATE BARU: Untuk melacak apakah MatchView harus ditampilkan
+    @State private var showMatchView = false
     
     // 💡 Responsive Layout: Mendeteksi jenis layar secara dinamis
     #if os(macOS)
@@ -38,29 +48,22 @@ struct DiscoveryViewResponsive: View {
                     // MARK: - TAMPILAN IPAD & MAC
                     VStack(spacing: 0) {
                         HStack(alignment: .top, spacing: 40) {
-                            // Sisi Kiri: Panel Filter Menetap
                             FilterSheetView(viewModel: viewModel, onClose: {})
                                 .frame(width: 320)
                                 .padding(.top, 20)
                             
-                            // Sisi Kanan: Header dan Area Tumpukan Kartu
                             VStack(spacing: 20) {
                                 headerSection
                                 cardStackSection
                             }
                         }
                         .padding(30)
-                        
-                        // 👈 NAV BAR BUFFER UNTUK IPAD/MAC
-                        Spacer()
-                            .frame(height: 75)
+                        Spacer().frame(height: 75)
                     }
                     
                 } else {
                     // MARK: - TAMPILAN IPHONE
                     VStack(spacing: 0) {
-                        
-                        // Dropdown Filter
                         if showFilterSheet {
                             FilterSheetView(viewModel: viewModel, onClose: {
                                 withAnimation(.spring(response: 0.4, dampingFraction: 0.8)) {
@@ -82,9 +85,7 @@ struct DiscoveryViewResponsive: View {
                         cardStackSection
                             .padding(.horizontal, 24)
                         
-                        // 👈 NAV BAR BUFFER UNTUK IPHONE (Kembali ke tempat semula)
-                        Spacer()
-                            .frame(height: 75)
+                        Spacer().frame(height: 75)
                     }
                 }
             }
@@ -105,9 +106,19 @@ struct DiscoveryViewResponsive: View {
                 }
             }
             .onAppear {
+                // 💡 PENGGUNAAN DUMMY DATA:
+                // Jika data kosong saat aplikasi dibuka, langsung isi dengan dummy books!
                 if viewModel.allBooks.isEmpty {
-                    viewModel.loadBooks()
+                    viewModel.allBooks = Book.dummyBooks
+                    viewModel.filteredBooks = Book.dummyBooks
+                    
+                    // Kalau Firebase sudah siap, uncomment kode di bawah ini dan hapus dummy di atas
+                    // viewModel.loadBooks()
                 }
+            }
+            // 💡 NAVIGASI KE MATCH VIEW: Membuka layar Match ketika state bernilai true
+            .fullScreenCover(isPresented: $showMatchView) {
+                MatchView()
             }
         }
     }
@@ -188,7 +199,9 @@ struct DiscoveryViewResponsive: View {
                                 }
                             },
                             onRequestSwap: {
-                                print("Request swap untuk buku ID: \(book.id)")
+                                // 💡 KONEKSI DIBUAT DI SINI:
+                                // Saat tombol ditekan, tampilkan Match View
+                                showMatchView = true
                             }
                         )
                         .background(Color.white)
@@ -207,4 +220,9 @@ struct DiscoveryViewResponsive: View {
             }
         }
     }
+}
+
+// MARK: - PREVIEW
+#Preview {
+    DiscoveryViewResponsive(previewBooks: Book.dummyBooks)
 }

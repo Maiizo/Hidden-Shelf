@@ -77,3 +77,14 @@ struct OpenLibraryDoc: Codable, Identifiable {
         return nil
     }
 }
+
+extension Book {
+    // Kumpulan dummy data untuk keperluan Testing UI tanpa Firebase
+    static let dummyBooks: [Book] = [
+        Book(id: UUID(), firestoreID: "dummy_1", title: "Misteri 1", author: "Penulis A", genre: "Fiction", publisher: "Penerbit X", pageCount: 200, quote: "Sebuah rahasia besar tersimpan di balik pintu itu...", coverUrl: nil, isAvailable: true, ownerId: "user_1", status: .available, dateAdded: Date()),
+        
+        Book(id: UUID(), firestoreID: "dummy_2", title: "Misteri 2", author: "Penulis B", genre: "Philosophy", publisher: "Penerbit Y", pageCount: 120, quote: "Hanya mereka yang berani melihat ke dalam diri sendiri yang akan menemukan kedamaian.", coverUrl: nil, isAvailable: true, ownerId: "user_2", status: .available, dateAdded: Date()),
+        
+        Book(id: UUID(), firestoreID: "dummy_3", title: "Misteri 3", author: "Penulis C", genre: "Sci-Fi", publisher: "Penerbit Z", pageCount: 350, quote: "Bintang-bintang tidak pernah salah, kitalah yang salah membacanya.", coverUrl: nil, isAvailable: true, ownerId: "user_3", status: .available, dateAdded: Date())
+    ]
+}

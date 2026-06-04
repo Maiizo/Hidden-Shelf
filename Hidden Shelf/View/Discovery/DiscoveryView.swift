@@ -55,10 +55,10 @@ struct DiscoveryView: View {
                             Image("Reading")
                                 .resizable()
                                 .scaledToFit()
-                                .frame(width: 50, height: 50)
+                                .frame(width: 40, height: 40)
                                 .background(
                                     Circle()
-                                        .fill(Theme.pistache)
+                                        .fill(Theme.almond)
                                         .frame(width: 80, height: 80)
                                         .offset(y: 5)
                                 )
@@ -85,7 +85,7 @@ struct DiscoveryView: View {
                         VStack(spacing: 15) {
                             Image("Box")
                                 .resizable()
-                                .frame(width: 100, height: 100)
+                                .frame(width: 120, height: 120)
                                 .scaledToFit()
                                 .background(
                                     Circle()
@@ -96,6 +96,7 @@ struct DiscoveryView: View {
                             Text("No mystery books found around you.")
                                 .font(.headline)
                                 .foregroundColor(Color(hex: "725C3A"))
+                                .padding(.top, 15)
                             Text("Try changing your filter preference.")
                                 .font(.subheadline)
                                 .foregroundColor(Color(hex: "725C3A").opacity(0.6))
