@@ -8,6 +8,22 @@
 import SwiftUI
 
 struct ProfileView: View {
+    // MARK: - State Variables
+    @State private var showingLocationSheet = false
+    @State private var selectedCity = "Jakarta"
+    @State private var showingMatchView = false
+    @State private var selectedSwap: SwapItem? = nil
+    
+    // MARK: - Dummy Data untuk Ongoing Swaps
+    @State private var ongoingSwaps: [SwapItem] = [
+        SwapItem(id: "1", bookTitle: "The Midnight Library", requesterName: "Alex Chen", status: "Waiting for confirmation", matchPercentage: 95),
+        SwapItem(id: "2", bookTitle: "Atomic Habits", requesterName: "Maya Sari", status: "Book sent", matchPercentage: 88),
+        SwapItem(id: "3", bookTitle: "Norwegian Wood", requesterName: "James Wong", status: "Ready to swap", matchPercentage: 92)
+    ]
+    
+    // MARK: - Data untuk Location
+    let cities = ["Jakarta", "Surabaya", "Bandung", "Medan", "Semarang", "Yogyakarta", "Bali", "Makassar"]
+    
     var body: some View {
         NavigationStack {
             ScrollView {
@@ -35,6 +51,24 @@ struct ProfileView: View {
                             Text("@bookworm_sarah")
                                 .font(.subheadline)
                                 .foregroundColor(Color(hex: "725C3A").opacity(0.7))
+                            
+                            // MARK: - Location Row (Bisa Ganti Location)
+                            HStack(spacing: 8) {
+                                Image(systemName: "location.fill")
+                                    .font(.caption)
+                                    .foregroundColor(Color(hex: "809671"))
+                                Text(selectedCity)
+                                    .font(.caption)
+                                    .foregroundColor(Color(hex: "725C3A"))
+                                Button(action: {
+                                    showingLocationSheet = true
+                                }) {
+                                    Image(systemName: "chevron.down")
+                                        .font(.caption2)
+                                        .foregroundColor(Color(hex: "809671"))
+                                }
+                            }
+                            .padding(.top, 4)
                         }
                     }
                     .padding(.top, 20)
@@ -43,6 +77,50 @@ struct ProfileView: View {
                     HStack(spacing: 24) {
                         StatCard(value: "23", title: "Books Shared")
                         StatCard(value: "17", title: "Swaps Made")
+                    }
+                    .padding(.horizontal, 20)
+                    
+                    // MARK: - Ongoing Swaps Section
+                    VStack(alignment: .leading, spacing: 12) {
+                        HStack {
+                            Text("Ongoing Swaps")
+                                .font(.headline)
+                                .fontWeight(.semibold)
+                                .foregroundColor(Color(hex: "725C3A"))
+                            
+                            Spacer()
+                            
+                            Text("\(ongoingSwaps.count) active")
+                                .font(.caption)
+                                .foregroundColor(Color(hex: "809671"))
+                        }
+                        .padding(.horizontal, 4)
+                        
+                        if ongoingSwaps.isEmpty {
+                            HStack {
+                                Spacer()
+                                VStack(spacing: 8) {
+                                    Image(systemName: "arrow.triangle.swap")
+                                        .font(.largeTitle)
+                                        .foregroundColor(Color(hex: "B3B792").opacity(0.5))
+                                    Text("No active swaps")
+                                        .font(.subheadline)
+                                        .foregroundColor(Color(hex: "725C3A").opacity(0.6))
+                                    Text("Start swapping books from Discover")
+                                        .font(.caption)
+                                        .foregroundColor(Color(hex: "725C3A").opacity(0.4))
+                                }
+                                Spacer()
+                            }
+                            .padding(.vertical, 20)
+                        } else {
+                            ForEach(ongoingSwaps) { swap in
+                                OngoingSwapCard(swap: swap) {
+                                    selectedSwap = swap
+                                    showingMatchView = true
+                                }
+                            }
+                        }
                     }
                     .padding(.horizontal, 20)
                     
@@ -110,8 +188,173 @@ struct ProfileView: View {
             }
             .background(Color(hex: "E5E0D8"))
             .navigationBarHidden(true)
+            .sheet(isPresented: $showingLocationSheet) {
+                LocationSelectionSheet(selectedCity: $selectedCity, cities: cities)
+            }
+            .navigationDestination(isPresented: $showingMatchView) {
+                MatchView()  // Tanpa parameter swapData
+            }
         }
     }
+}
+
+// MARK: - Location Selection Sheet (Bisa Ganti Location)
+struct LocationSelectionSheet: View {
+    @Binding var selectedCity: String
+    let cities: [String]
+    @Environment(\.dismiss) var dismiss
+    
+    var body: some View {
+        NavigationStack {
+            ZStack {
+                Color(hex: "E5E0D8").ignoresSafeArea()
+                
+                VStack(spacing: 20) {
+                    Text("Select Your City")
+                        .font(.title2)
+                        .fontWeight(.bold)
+                        .foregroundColor(Color(hex: "725C3A"))
+                        .padding(.top, 24)
+                    
+                    Text("Choose your location to find nearby book swaps")
+                        .font(.subheadline)
+                        .foregroundColor(Color(hex: "725C3A").opacity(0.7))
+                        .multilineTextAlignment(.center)
+                        .padding(.horizontal, 24)
+                    
+                    ScrollView {
+                        VStack(spacing: 12) {
+                            ForEach(cities, id: \.self) { city in
+                                Button(action: {
+                                    selectedCity = city
+                                    dismiss()
+                                }) {
+                                    HStack {
+                                        Image(systemName: city == selectedCity ? "location.circle.fill" : "location.circle")
+                                            .foregroundColor(Color(hex: "809671"))
+                                        Text(city)
+                                            .foregroundColor(Color(hex: "725C3A"))
+                                        Spacer()
+                                        if city == selectedCity {
+                                            Image(systemName: "checkmark")
+                                                .foregroundColor(Color(hex: "809671"))
+                                        }
+                                    }
+                                    .padding()
+                                    .background(Color.white)
+                                    .cornerRadius(12)
+                                    .overlay(
+                                        RoundedRectangle(cornerRadius: 12)
+                                            .stroke(Color(hex: "B3B792").opacity(0.3), lineWidth: 1)
+                                    )
+                                }
+                            }
+                        }
+                        .padding(.horizontal, 20)
+                        .padding(.top, 10)
+                    }
+                }
+            }
+            .toolbar {
+                ToolbarItem(placement: .navigationBarTrailing) {
+                    Button("Done") {
+                        dismiss()
+                    }
+                    .foregroundColor(Color(hex: "809671"))
+                }
+            }
+        }
+        .presentationDetents([.medium, .large])
+    }
+}
+
+// MARK: - Ongoing Swap Card Component
+struct OngoingSwapCard: View {
+    let swap: SwapItem
+    let onTap: () -> Void
+    
+    var body: some View {
+        Button(action: onTap) {
+            HStack(spacing: 16) {
+                // Book Cover Placeholder
+                ZStack {
+                    RoundedRectangle(cornerRadius: 12)
+                        .fill(Color(hex: "D2AB80").opacity(0.3))
+                        .frame(width: 60, height: 80)
+                    Image(systemName: "book.closed.fill")
+                        .font(.title2)
+                        .foregroundColor(Color(hex: "809671"))
+                }
+                
+                VStack(alignment: .leading, spacing: 6) {
+                    Text(swap.bookTitle)
+                        .font(.subheadline)
+                        .fontWeight(.semibold)
+                        .foregroundColor(Color(hex: "725C3A"))
+                    
+                    Text("With: \(swap.requesterName)")
+                        .font(.caption)
+                        .foregroundColor(Color(hex: "725C3A").opacity(0.7))
+                    
+                    HStack(spacing: 8) {
+                        // Status badge
+                        Text(swap.status)
+                            .font(.caption2)
+                            .padding(.horizontal, 8)
+                            .padding(.vertical, 3)
+                            .background(
+                                Capsule()
+                                    .fill(statusColor(swap.status).opacity(0.2))
+                            )
+                            .foregroundColor(statusColor(swap.status))
+                        
+                        // Match percentage
+                        HStack(spacing: 4) {
+                            Image(systemName: "heart.fill")
+                                .font(.caption2)
+                                .foregroundColor(Color(hex: "D2AB80"))
+                            Text("\(swap.matchPercentage)% match")
+                                .font(.caption2)
+                                .foregroundColor(Color(hex: "725C3A").opacity(0.6))
+                        }
+                    }
+                }
+                
+                Spacer()
+                
+                Image(systemName: "chevron.right")
+                    .font(.caption)
+                    .foregroundColor(Color(hex: "B3B792"))
+            }
+            .padding(12)
+            .background(Color.white)
+            .cornerRadius(16)
+            .shadow(color: Color(hex: "725C3A").opacity(0.08), radius: 4, x: 0, y: 2)
+        }
+        .buttonStyle(PlainButtonStyle())
+    }
+    
+    private func statusColor(_ status: String) -> Color {
+        switch status {
+        case "Waiting for confirmation":
+            return Color(hex: "D2AB80")
+        case "Book sent":
+            return Color(hex: "809671")
+        case "Ready to swap":
+            return Color(hex: "B3B792")
+        default:
+            return Color(hex: "725C3A")
+        }
+    }
+}
+
+// MARK: - Swap Item Model
+struct SwapItem: Identifiable {
+    let id: String
+    let bookTitle: String
+    let requesterName: String
+    let status: String
+    let matchPercentage: Int
 }
 
 // MARK: - Stat Card Component
@@ -255,14 +498,12 @@ struct MediumWidgetCard: View {
 struct MainTabView: View {
     var body: some View {
         TabView {
-            // Gunakan DiscoveryView dari folder Discovery
             DiscoveryView()
                 .tabItem {
                     Image(systemName: "safari")
                     Text("Discover")
                 }
             
-            // Gunakan MyShelfView dari folder MyShelf
             MyShelfView()
                 .tabItem {
                     Image(systemName: "books.vertical")
