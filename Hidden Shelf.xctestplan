@@ -1,0 +1,30 @@
+{
+  "configurations" : [
+    {
+      "id" : "3CAC218D-20C1-4844-BADF-8032F96865B5",
+      "name" : "Test Scheme Action",
+      "options" : {
+
+      }
+    }
+  ],
+  "defaultOptions" : {
+    "codeCoverage" : false,
+    "performanceAntipatternCheckerEnabled" : true,
+    "targetForVariableExpansion" : {
+      "containerPath" : "container:Hidden Shelf.xcodeproj",
+      "identifier" : "3F7330D72FC922B700DC4C2D",
+      "name" : "Hidden Shelf"
+    }
+  },
+  "testTargets" : [
+    {
+      "target" : {
+        "containerPath" : "container:Hidden Shelf.xcodeproj",
+        "identifier" : "3F7330E42FC922B800DC4C2D",
+        "name" : "Hidden ShelfTests"
+      }
+    }
+  ],
+  "version" : 1
+}
