@@ -6,6 +6,8 @@
 //
 
 import SwiftUI
+import FirebaseAuth
+import FirebaseFirestore
 
 struct ProfileView: View {
     // MARK: - State Variables
@@ -13,13 +15,19 @@ struct ProfileView: View {
     @State private var selectedCity = "Jakarta"
     @State private var showingMatchView = false
     @State private var selectedSwap: SwapItem? = nil
+    @State private var isLoading = true
     
-    // MARK: - Dummy Data untuk Ongoing Swaps
-    @State private var ongoingSwaps: [SwapItem] = [
-        SwapItem(id: "1", bookTitle: "The Midnight Library", requesterName: "Alex Chen", status: "Waiting for confirmation", matchPercentage: 95),
-        SwapItem(id: "2", bookTitle: "Atomic Habits", requesterName: "Maya Sari", status: "Book sent", matchPercentage: 88),
-        SwapItem(id: "3", bookTitle: "Norwegian Wood", requesterName: "James Wong", status: "Ready to swap", matchPercentage: 92)
-    ]
+    // MARK: - User Data dari Firebase
+    @State private var fullName = ""
+    @State private var email = ""
+    @State private var bio = ""
+    @State private var userId = ""
+    @State private var profileImageUrl = ""
+    @State private var booksShared = 0
+    @State private var swapsMade = 0
+    
+    // MARK: - Dummy Data untuk Ongoing Swaps (nanti bisa diambil dari Firestore)
+    @State private var ongoingSwaps: [SwapItem] = []
     
     // MARK: - Data untuk Location
     let cities = ["Jakarta", "Surabaya", "Bandung", "Medan", "Semarang", "Yogyakarta", "Bali", "Makassar"]
@@ -27,163 +35,238 @@ struct ProfileView: View {
     var body: some View {
         NavigationStack {
             ScrollView {
-                VStack(spacing: 24) {
-                    
-                    // MARK: - Header (Avatar & User Info)
-                    VStack(spacing: 12) {
-                        // Avatar - Menggunakan gambar Hahoh
-                        Image("Hahoh")
-                            .resizable()
-                            .scaledToFit()
-                            .frame(width: 90, height: 90)
-                            .clipShape(Circle())
+                if isLoading {
+                    VStack(spacing: 20) {
+                        ProgressView()
+                            .scaleEffect(1.5)
+                            .tint(Color(hex: "809671"))
+                        Text("Loading profile...")
+                            .foregroundColor(Color(hex: "725C3A"))
+                    }
+                    .frame(maxWidth: .infinity, minHeight: 500)
+                } else {
+                    VStack(spacing: 24) {
+                        
+                        // MARK: - Header (Avatar & User Info)
+                        VStack(spacing: 12) {
+                            // Avatar - Default atau dari URL
+                            ZStack {
+                                Circle()
+                                    .fill(Color(hex: "E5D2B8"))
+                                    .frame(width: 90, height: 90)
+                                
+                                if profileImageUrl.isEmpty {
+                                    Image(systemName: "person.circle.fill")
+                                        .resizable()
+                                        .scaledToFit()
+                                        .frame(width: 80, height: 80)
+                                        .foregroundColor(Color(hex: "809671"))
+                                } else {
+                                    // AsyncImage untuk gambar dari URL
+                                    AsyncImage(url: URL(string: profileImageUrl)) { image in
+                                        image
+                                            .resizable()
+                                            .scaledToFill()
+                                            .frame(width: 90, height: 90)
+                                            .clipShape(Circle())
+                                    } placeholder: {
+                                        Image(systemName: "person.circle.fill")
+                                            .resizable()
+                                            .scaledToFit()
+                                            .frame(width: 80, height: 80)
+                                            .foregroundColor(Color(hex: "809671"))
+                                    }
+                                }
+                            }
                             .overlay(
                                 Circle()
                                     .stroke(Color(hex: "B3B792"), lineWidth: 2)
                             )
+                            
+                            VStack(spacing: 4) {
+                                Text(fullName.isEmpty ? "User" : fullName)
+                                    .font(.title2)
+                                    .fontWeight(.bold)
+                                    .foregroundColor(Color(hex: "725C3A"))
+                                
+                                Text(email)
+                                    .font(.subheadline)
+                                    .foregroundColor(Color(hex: "725C3A").opacity(0.7))
+                                
+                                // Bio
+                                if !bio.isEmpty {
+                                    Text(bio)
+                                        .font(.caption)
+                                        .foregroundColor(Color(hex: "725C3A").opacity(0.6))
+                                        .multilineTextAlignment(.center)
+                                        .padding(.horizontal, 40)
+                                        .padding(.top, 4)
+                                }
+                                
+                                // MARK: - Location Row
+                                HStack(spacing: 8) {
+                                    Image(systemName: "location.fill")
+                                        .font(.caption)
+                                        .foregroundColor(Color(hex: "809671"))
+                                    Text(selectedCity)
+                                        .font(.caption)
+                                        .foregroundColor(Color(hex: "725C3A"))
+                                    Button(action: {
+                                        showingLocationSheet = true
+                                    }) {
+                                        Image(systemName: "chevron.down")
+                                            .font(.caption2)
+                                            .foregroundColor(Color(hex: "809671"))
+                                    }
+                                }
+                                .padding(.top, 4)
+                            }
+                        }
+                        .padding(.top, 20)
                         
-                        VStack(spacing: 4) {
-                            Text("Sarah Johnson")
-                                .font(.title2)
-                                .fontWeight(.bold)
-                                .foregroundColor(Color(hex: "725C3A"))
-                            
-                            Text("@bookworm_sarah")
-                                .font(.subheadline)
-                                .foregroundColor(Color(hex: "725C3A").opacity(0.7))
-                            
-                            // MARK: - Location Row (Bisa Ganti Location)
-                            HStack(spacing: 8) {
-                                Image(systemName: "location.fill")
+                        // MARK: - Stats Row (Books Shared & Swaps Made) - Data Real
+                        HStack(spacing: 24) {
+                            StatCard(value: "\(booksShared)", title: "Books Shared")
+                            StatCard(value: "\(swapsMade)", title: "Swaps Made")
+                        }
+                        .padding(.horizontal, 20)
+                        
+                        // MARK: - Edit Profile Button
+                        Button(action: {
+                            // Navigasi ke Edit Profile
+                            print("Edit Profile tapped")
+                        }) {
+                            HStack {
+                                Image(systemName: "pencil")
+                                Text("Edit Profile")
+                            }
+                            .font(.subheadline)
+                            .fontWeight(.medium)
+                            .frame(maxWidth: .infinity)
+                            .padding(.vertical, 10)
+                            .background(Color(hex: "809671"))
+                            .foregroundColor(.white)
+                            .cornerRadius(20)
+                        }
+                        .padding(.horizontal, 60)
+                        
+                        // MARK: - Ongoing Swaps Section
+                        VStack(alignment: .leading, spacing: 12) {
+                            HStack {
+                                Text("Ongoing Swaps")
+                                    .font(.headline)
+                                    .fontWeight(.semibold)
+                                    .foregroundColor(Color(hex: "725C3A"))
+                                
+                                Spacer()
+                                
+                                Text("\(ongoingSwaps.count) active")
                                     .font(.caption)
                                     .foregroundColor(Color(hex: "809671"))
-                                Text(selectedCity)
-                                    .font(.caption)
-                                    .foregroundColor(Color(hex: "725C3A"))
-                                Button(action: {
-                                    showingLocationSheet = true
-                                }) {
-                                    Image(systemName: "chevron.down")
-                                        .font(.caption2)
-                                        .foregroundColor(Color(hex: "809671"))
+                            }
+                            .padding(.horizontal, 4)
+                            
+                            if ongoingSwaps.isEmpty {
+                                HStack {
+                                    Spacer()
+                                    VStack(spacing: 8) {
+                                        Image(systemName: "arrow.triangle.swap")
+                                            .font(.largeTitle)
+                                            .foregroundColor(Color(hex: "B3B792").opacity(0.5))
+                                        Text("No active swaps")
+                                            .font(.subheadline)
+                                            .foregroundColor(Color(hex: "725C3A").opacity(0.6))
+                                        Text("Start swapping books from Discover")
+                                            .font(.caption)
+                                            .foregroundColor(Color(hex: "725C3A").opacity(0.4))
+                                    }
+                                    Spacer()
+                                }
+                                .padding(.vertical, 20)
+                            } else {
+                                ForEach(ongoingSwaps) { swap in
+                                    OngoingSwapCard(swap: swap) {
+                                        selectedSwap = swap
+                                        showingMatchView = true
+                                    }
                                 }
                             }
-                            .padding(.top, 4)
                         }
-                    }
-                    .padding(.top, 20)
-                    
-                    // MARK: - Stats Row (Books Shared & Swaps Made)
-                    HStack(spacing: 24) {
-                        StatCard(value: "23", title: "Books Shared")
-                        StatCard(value: "17", title: "Swaps Made")
-                    }
-                    .padding(.horizontal, 20)
-                    
-                    // MARK: - Ongoing Swaps Section
-                    VStack(alignment: .leading, spacing: 12) {
-                        HStack {
-                            Text("Ongoing Swaps")
+                        .padding(.horizontal, 20)
+                        
+                        // MARK: - Settings Menu
+                        VStack(spacing: 0) {
+                            SettingsMenuItem(icon: "bell.fill", title: "Notifications", color: Color(hex: "809671"))
+                            
+                            Divider()
+                                .background(Color(hex: "B3B792").opacity(0.3))
+                                .padding(.leading, 52)
+                            
+                            SettingsMenuItem(icon: "lock.fill", title: "Privacy", color: Color(hex: "809671"))
+                            
+                            Divider()
+                                .background(Color(hex: "B3B792").opacity(0.3))
+                                .padding(.leading, 52)
+                            
+                            SettingsMenuItem(icon: "info.circle.fill", title: "About", color: Color(hex: "809671"))
+                            
+                            Divider()
+                                .background(Color(hex: "B3B792").opacity(0.3))
+                                .padding(.leading, 52)
+                            
+                            // Logout Button
+                            Button(action: {
+                                logoutUser()
+                            }) {
+                                HStack {
+                                    Image(systemName: "rectangle.portrait.and.arrow.right")
+                                        .foregroundColor(Color(hex: "D2AB80"))
+                                        .frame(width: 28, height: 28)
+                                    
+                                    Text("Logout")
+                                        .font(.body)
+                                        .foregroundColor(Color(hex: "D2AB80"))
+                                    
+                                    Spacer()
+                                    
+                                    Image(systemName: "chevron.right")
+                                        .font(.caption)
+                                        .foregroundColor(Color(hex: "B3B792"))
+                                }
+                                .padding(.horizontal, 16)
+                                .padding(.vertical, 14)
+                            }
+                        }
+                        .background(Color(hex: "E5D2B8"))
+                        .cornerRadius(16)
+                        .padding(.horizontal, 20)
+                        
+                        // MARK: - Home Screen Widgets Section
+                        VStack(alignment: .leading, spacing: 16) {
+                            Text("Home Screen Widgets")
                                 .font(.headline)
                                 .fontWeight(.semibold)
                                 .foregroundColor(Color(hex: "725C3A"))
-                            
-                            Spacer()
-                            
-                            Text("\(ongoingSwaps.count) active")
-                                .font(.caption)
-                                .foregroundColor(Color(hex: "809671"))
-                        }
-                        .padding(.horizontal, 4)
-                        
-                        if ongoingSwaps.isEmpty {
-                            HStack {
-                                Spacer()
-                                VStack(spacing: 8) {
-                                    Image(systemName: "arrow.triangle.swap")
-                                        .font(.largeTitle)
-                                        .foregroundColor(Color(hex: "B3B792").opacity(0.5))
-                                    Text("No active swaps")
-                                        .font(.subheadline)
-                                        .foregroundColor(Color(hex: "725C3A").opacity(0.6))
-                                    Text("Start swapping books from Discover")
-                                        .font(.caption)
-                                        .foregroundColor(Color(hex: "725C3A").opacity(0.4))
-                                }
-                                Spacer()
-                            }
-                            .padding(.vertical, 20)
-                        } else {
-                            ForEach(ongoingSwaps) { swap in
-                                OngoingSwapCard(swap: swap) {
-                                    selectedSwap = swap
-                                    showingMatchView = true
-                                }
-                            }
-                        }
-                    }
-                    .padding(.horizontal, 20)
-                    
-                    // MARK: - Settings Menu
-                    VStack(spacing: 0) {
-                        SettingsMenuItem(icon: "bell.fill", title: "Notifications", color: Color(hex: "809671"))
-                        
-                        Divider()
-                            .background(Color(hex: "B3B792").opacity(0.3))
-                            .padding(.leading, 52)
-                        
-                        SettingsMenuItem(icon: "lock.fill", title: "Privacy", color: Color(hex: "809671"))
-                        
-                        Divider()
-                            .background(Color(hex: "B3B792").opacity(0.3))
-                            .padding(.leading, 52)
-                        
-                        SettingsMenuItem(icon: "info.circle.fill", title: "About", color: Color(hex: "809671"))
-                    }
-                    .background(Color(hex: "E5D2B8"))
-                    .cornerRadius(16)
-                    .padding(.horizontal, 20)
-                    
-                    // MARK: - Home Screen Widgets Section
-                    VStack(alignment: .leading, spacing: 16) {
-                        Text("Home Screen Widgets")
-                            .font(.headline)
-                            .fontWeight(.semibold)
-                            .foregroundColor(Color(hex: "725C3A"))
-                            .padding(.horizontal, 4)
-                        
-                        // Small Widget
-                        VStack(alignment: .leading, spacing: 8) {
-                            Text("Small Widget")
-                                .font(.caption)
-                                .foregroundColor(Color(hex: "725C3A").opacity(0.7))
+                                .padding(.horizontal, 4)
                             
                             SmallWidgetCard()
-                        }
-                        
-                        // Medium Widget
-                        VStack(alignment: .leading, spacing: 8) {
-                            Text("Medium Widget")
-                                .font(.caption)
-                                .foregroundColor(Color(hex: "725C3A").opacity(0.7))
-                            
                             MediumWidgetCard()
                         }
-                    }
-                    .padding(.horizontal, 20)
-                    
-                    // MARK: - Version Footer
-                    VStack(spacing: 4) {
-                        Text("Hidden Shelf v1.0")
-                            .font(.caption2)
-                            .foregroundColor(Color(hex: "725C3A").opacity(0.5))
+                        .padding(.horizontal, 20)
                         
-                        Text("Sustainable book swapping")
-                            .font(.caption2)
-                            .foregroundColor(Color(hex: "725C3A").opacity(0.4))
+                        // MARK: - Version Footer
+                        VStack(spacing: 4) {
+                            Text("Hidden Shelf v1.0")
+                                .font(.caption2)
+                                .foregroundColor(Color(hex: "725C3A").opacity(0.5))
+                            
+                            Text("Sustainable book swapping")
+                                .font(.caption2)
+                                .foregroundColor(Color(hex: "725C3A").opacity(0.4))
+                        }
+                        .padding(.top, 8)
+                        .padding(.bottom, 20)
                     }
-                    .padding(.top, 8)
-                    .padding(.bottom, 20)
                 }
             }
             .background(Color(hex: "E5E0D8"))
@@ -192,13 +275,67 @@ struct ProfileView: View {
                 LocationSelectionSheet(selectedCity: $selectedCity, cities: cities)
             }
             .navigationDestination(isPresented: $showingMatchView) {
-                MatchView()  // Tanpa parameter swapData
+                MatchView()
             }
+        }
+        .onAppear {
+            loadUserData()
+        }
+    }
+    
+    // MARK: - Load User Data dari Firebase
+    private func loadUserData() {
+        guard let currentUser = Auth.auth().currentUser else {
+            isLoading = false
+            return
+        }
+        
+        userId = currentUser.uid
+        email = currentUser.email ?? ""
+        
+        let db = Firestore.firestore()
+        db.collection("users").document(userId).getDocument { document, error in
+            isLoading = false
+            
+            if let error = error {
+                print("❌ Error loading user data: \(error.localizedDescription)")
+                return
+            }
+            
+            if let data = document?.data() {
+                fullName = data["fullName"] as? String ?? ""
+                bio = data["bio"] as? String ?? ""
+                profileImageUrl = data["profileImageUrl"] as? String ?? ""
+                booksShared = data["booksShared"] as? Int ?? 0
+                swapsMade = data["swapsMade"] as? Int ?? 0
+                
+                // Jika ada saved city
+                if let savedCity = data["city"] as? String {
+                    selectedCity = savedCity
+                }
+                
+                print("✅ User data loaded: \(fullName)")
+            }
+        }
+    }
+    
+    // MARK: - Logout
+    private func logoutUser() {
+        do {
+            try Auth.auth().signOut()
+            // Kembali ke LoginView
+            if let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
+               let window = windowScene.windows.first {
+                window.rootViewController = UIHostingController(rootView: LoginView())
+                window.makeKeyAndVisible()
+            }
+        } catch {
+            print("❌ Logout error: \(error.localizedDescription)")
         }
     }
 }
 
-// MARK: - Location Selection Sheet (Bisa Ganti Location)
+// MARK: - Location Selection Sheet
 struct LocationSelectionSheet: View {
     @Binding var selectedCity: String
     let cities: [String]
@@ -227,6 +364,7 @@ struct LocationSelectionSheet: View {
                             ForEach(cities, id: \.self) { city in
                                 Button(action: {
                                     selectedCity = city
+                                    saveCityToFirestore(city)
                                     dismiss()
                                 }) {
                                     HStack {
@@ -266,9 +404,21 @@ struct LocationSelectionSheet: View {
         }
         .presentationDetents([.medium, .large])
     }
+    
+    private func saveCityToFirestore(_ city: String) {
+        guard let userId = Auth.auth().currentUser?.uid else { return }
+        let db = Firestore.firestore()
+        db.collection("users").document(userId).updateData(["city": city]) { error in
+            if let error = error {
+                print("❌ Error saving city: \(error.localizedDescription)")
+            } else {
+                print("✅ City saved: \(city)")
+            }
+        }
+    }
 }
 
-// MARK: - Ongoing Swap Card Component
+// MARK: - Ongoing Swap Card Component (Sama seperti sebelumnya)
 struct OngoingSwapCard: View {
     let swap: SwapItem
     let onTap: () -> Void
@@ -276,7 +426,6 @@ struct OngoingSwapCard: View {
     var body: some View {
         Button(action: onTap) {
             HStack(spacing: 16) {
-                // Book Cover Placeholder
                 ZStack {
                     RoundedRectangle(cornerRadius: 12)
                         .fill(Color(hex: "D2AB80").opacity(0.3))
@@ -297,18 +446,13 @@ struct OngoingSwapCard: View {
                         .foregroundColor(Color(hex: "725C3A").opacity(0.7))
                     
                     HStack(spacing: 8) {
-                        // Status badge
                         Text(swap.status)
                             .font(.caption2)
                             .padding(.horizontal, 8)
                             .padding(.vertical, 3)
-                            .background(
-                                Capsule()
-                                    .fill(statusColor(swap.status).opacity(0.2))
-                            )
+                            .background(Capsule().fill(statusColor(swap.status).opacity(0.2)))
                             .foregroundColor(statusColor(swap.status))
                         
-                        // Match percentage
                         HStack(spacing: 4) {
                             Image(systemName: "heart.fill")
                                 .font(.caption2)
@@ -336,14 +480,10 @@ struct OngoingSwapCard: View {
     
     private func statusColor(_ status: String) -> Color {
         switch status {
-        case "Waiting for confirmation":
-            return Color(hex: "D2AB80")
-        case "Book sent":
-            return Color(hex: "809671")
-        case "Ready to swap":
-            return Color(hex: "B3B792")
-        default:
-            return Color(hex: "725C3A")
+        case "Waiting for confirmation": return Color(hex: "D2AB80")
+        case "Book sent": return Color(hex: "809671")
+        case "Ready to swap": return Color(hex: "B3B792")
+        default: return Color(hex: "725C3A")
         }
     }
 }
@@ -494,32 +634,6 @@ struct MediumWidgetCard: View {
     }
 }
 
-// MARK: - Tab Bar Controller (Main View dengan 3 tabs)
-struct MainTabView: View {
-    var body: some View {
-        TabView {
-            DiscoveryView()
-                .tabItem {
-                    Image(systemName: "safari")
-                    Text("Discover")
-                }
-            
-            MyShelfView()
-                .tabItem {
-                    Image(systemName: "books.vertical")
-                    Text("My Shelf")
-                }
-            
-            ProfileView()
-                .tabItem {
-                    Image(systemName: "person")
-                    Text("Profile")
-                }
-        }
-        .accentColor(Color(hex: "809671"))
-    }
-}
-
 #Preview {
-    MainTabView()
+    ProfileView()
 }
