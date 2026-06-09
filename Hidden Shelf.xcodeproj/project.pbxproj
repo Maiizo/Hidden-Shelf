@@ -64,7 +64,7 @@
 		3F7330D82FC922B700DC4C2D /* Hidden Shelf.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Hidden Shelf.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		3F7330E52FC922B800DC4C2D /* Hidden ShelfTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "Hidden ShelfTests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		3F7330EF2FC922B800DC4C2D /* Hidden ShelfUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "Hidden ShelfUITests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
-		3F7FCF352FD120FF00CFEB26 /* Hidden Shelf.xctestplan */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Hidden Shelf.xctestplan"; sourceTree = "<group>"; };
+		3F7FCF352FD120FF00CFEB26 /* Hidden Shelf.xctestplan */ = {isa = PBXFileReference; lastKnownFileType = text; path = "Hidden Shelf.xctestplan"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
