@@ -118,8 +118,9 @@ struct DiscoveryViewResponsive: View {
             }
             // 💡 NAVIGASI KE MATCH VIEW: Membuka layar Match ketika state bernilai true
             .fullScreenCover(isPresented: $showMatchView) {
-                MatchView()
-            }
+                            // Berikan ID statis untuk keperluan demo Real-Time
+                            MatchView(matchIdToLoad: "DEMO_MATCH_01")
+                        }
         }
     }
     
