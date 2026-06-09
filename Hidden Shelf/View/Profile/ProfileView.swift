@@ -255,6 +255,10 @@ struct ProfileView: View {
             .navigationBarHidden(true)
             .sheet(isPresented: $showingLocationSheet) {
                 LocationSelectionSheet(selectedCity: $selectedCity, cities: cities)
+                    .onDisappear {
+                        // Simpan perubahan kota ke Firestore saat sheet ditutup
+                        updateUserCity(selectedCity)
+                    }
             }
             .navigationDestination(isPresented: $showingMatchView) {
                 MatchView()
@@ -263,6 +267,19 @@ struct ProfileView: View {
                 loadUserProfile()
                 loadUserStats()
                 loadOngoingSwaps()
+            }
+        }
+    }
+    
+    // MARK: - Update User City ke Firestore
+    private func updateUserCity(_ city: String) {
+        guard let userId = Auth.auth().currentUser?.uid else { return }
+        
+        db.collection("users").document(userId).updateData(["city": city]) { error in
+            if let error = error {
+                print("Error saving city to Firestore: \(error.localizedDescription)")
+            } else {
+                print("City successfully saved: \(city)")
             }
         }
     }
