@@ -21,6 +21,18 @@ struct MatchView: View {
                 Theme.almond.ignoresSafeArea()
                 
                 VStack(spacing: 0) {
+                    
+                    HStack {
+                                    Button(action: {
+                                        dismiss() 
+                                    }) {
+                                        Image(systemName: "chevron.left")
+                                            .font(.title2)
+                                            .foregroundColor(.primary)
+                                    }
+                                    .padding()
+                                    Spacer()
+                                }
                     if viewModel.currentMatch != nil {
                         
                         // 🌍 PETA ADAPTIF
@@ -100,17 +112,21 @@ struct MatchView: View {
                         .shadow(color: Theme.carob.opacity(0.1), radius: 5)
                         .offset(y: -20)
                         
-                    } else {
-                        // TAMPILAN LOADING/FALLBACK
-                        VStack(spacing: 16) {
-                            ProgressView()
-                                .scaleEffect(1.5)
-                                .tint(Theme.matcha)
-                            Text("Loading Meeting Point...")
-                                .font(.system(.title3, design: .serif))
-                                .foregroundColor(Theme.carob)
+                        // In MatchView body, replace the else branch:
+                        } else {
+                            ZStack {
+                                Theme.almond.ignoresSafeArea()   // ← add this so it's not white
+                                VStack(spacing: 16) {
+                                    ProgressView()
+                                        .scaleEffect(1.5)
+                                        .tint(Theme.matcha)
+                                    Text("Loading Meeting Point...")
+                                        .font(.system(.title3, design: .serif))
+                                        .foregroundColor(Theme.carob)
+                                }
+                            } .frame(maxWidth: .infinity, maxHeight: .infinity)
                         }
-                        .frame(maxWidth: .infinity, maxHeight: .infinity)
+                       
                     }
                 }
             }
@@ -141,7 +157,6 @@ struct MatchView: View {
             }
         }
     }
-}
 
 // Helper View tetap sama
 struct StepIndicator: View {
@@ -161,3 +176,6 @@ struct StepIndicator: View {
     }
 }
 
+#Preview{
+    MatchView()
+}

@@ -22,23 +22,24 @@ class DiscoveryViewModel: ObservableObject {
     let cities = ["All Cities", "Surabaya", "Jakarta", "Bandung", "Malang"]
     
     private var db = Firestore.firestore()
-    
+    private var currentUserId: String {
+        Auth.auth().currentUser?.uid ?? ""
+    }
+
     func loadBooks() {
-        print("\n🔥🔥🔥 LOAD BOOKS DISCOVER 🔥🔥🔥")
-        
-        // CEK USER LOGIN
         guard let currentUser = Auth.auth().currentUser else {
             print("❌ USER TIDAK LOGIN!")
             return
         }
         
-        print("📱 User login UID: \(currentUser.uid)")
+        // Capture the uid immediately so it's available in all nested closures
+        let currentUID = currentUser.uid
+        
+        print("📱 User login UID: \(currentUID)")
         print("📱 User email: \(currentUser.email ?? "unknown")")
         
         isLoading = true
         
-        // 🔥 CEK SEMUA BUKU DULU (TANPA FILTER APAPUN)
-        print("\n----- CEK SEMUA BUKU DI FIRESTORE (NO FILTER) -----")
         db.collection("books").getDocuments { snapshot, error in
             if let error = error {
                 print("❌ Error: \(error)")
@@ -46,48 +47,18 @@ class DiscoveryViewModel: ObservableObject {
             }
             
             guard let allDocs = snapshot?.documents else {
-                print("⚠️ FIRESTORE KOSONG! Tidak ada buku sama sekali.")
+                print("⚠️ FIRESTORE KOSONG!")
                 return
             }
+   
             
-            print("📊 TOTAL BUKU DI FIRESTORE: \(allDocs.count)")
-            
-            for (index, doc) in allDocs.enumerated() {
-                let data = doc.data()
-                let ownerId = data["ownerId"] as? String ?? "NO_OWNER_ID"
-                let isAvail = data["isAvailable"] as? Bool ?? false
-                let title = data["title"] as? String ?? "NO_TITLE"
-                let isSelf = (ownerId == currentUser.uid) ? "⭐ MILIK SENDIRI" : "👤 MILIK ORANG LAIN"
-                
-                print("\(index+1). [\(doc.documentID)]")
-                print("   Title: \(title)")
-                print("   ownerId: \(ownerId)")
-                print("   isAvailable: \(isAvail)")
-                print("   Status: \(isSelf)")
-                print("   ---")
-            }
-            
-            // 🔥 HITUNG MANUAL BUKU YANG LAYAK TAMPIL
-            print("\n----- FILTER MANUAL DI KODE -----")
             let eligibleBooks = allDocs.filter { doc in
                 let data = doc.data()
                 let ownerId = data["ownerId"] as? String ?? ""
                 let isAvailable = data["isAvailable"] as? Bool ?? false
-                
-                let isNotSelf = (ownerId != currentUser.uid)
-                let isAvailableTrue = (isAvailable == true)
-                
-                return isNotSelf && isAvailableTrue
+                return (ownerId != currentUID) && isAvailable  // ← use currentUID
             }
             
-            print("📊 Buku yang layak tampil (bukan milik sendiri & available): \(eligibleBooks.count)")
-            
-            for doc in eligibleBooks {
-                let data = doc.data()
-                print("   ✅ LAYAK: \(data["title"] ?? "?") | ownerId: \(data["ownerId"] ?? "?")")
-            }
-            
-            // 🔥 UPDATE UI
             DispatchQueue.main.async {
                 self.allBooks = eligibleBooks.compactMap { doc -> Book? in
                     let data = doc.data()
@@ -95,7 +66,6 @@ class DiscoveryViewModel: ObservableObject {
                     let date = timestamp?.dateValue() ?? Date()
                     let statusString = data["status"] as? String ?? "Available"
                     let shelfStatus = ShelfStatus(rawValue: statusString) ?? .available
-                    let ownerId = data["ownerId"] as? String ?? ""
                     
                     return Book(
                         id: UUID(),
@@ -108,14 +78,13 @@ class DiscoveryViewModel: ObservableObject {
                         quote: data["quote"] as? String ?? "",
                         coverUrl: data["coverUrl"] as? String,
                         isAvailable: data["isAvailable"] as? Bool ?? true,
-                        ownerId: ownerId,
+                        ownerId: data["ownerId"] as? String ?? "",
                         status: shelfStatus,
                         dateAdded: date
                     )
                 }
                 self.isLoading = false
                 self.applyFilters()
-                print("📊 allBooks count setelah mapping: \(self.allBooks.count)")
             }
         }
     }
@@ -156,11 +125,15 @@ class DiscoveryViewModel: ObservableObject {
     
     // Membuat dokumen Match baru di Firebase
     func requestSwap(for book: Book, completion: @escaping (String) -> Void) {
+        guard let currentUser = Auth.auth().currentUser else {
+               print("Error: no user logged in")
+               return
+           }
         let matchRef = db.collection("matches").document() // Bikin ID acak baru
         
         let matchData: [String: Any] = [
             "bookId": book.firestoreID ?? "",
-            "requesterId": "currentUser", // Nanti pakai ID asli
+            "requesterId": currentUser.uid, 
             "ownerId": book.ownerId,
             "requesterStatus": 0,
             "ownerStatus": 0,

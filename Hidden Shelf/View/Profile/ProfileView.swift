@@ -261,7 +261,9 @@ struct ProfileView: View {
                     }
             }
             .navigationDestination(isPresented: $showingMatchView) {
-                MatchView()
+                if let swap = selectedSwap {
+                       MatchView(matchIdToLoad: swap.id)  // ← was MatchView() with no arg
+                   }
             }
             .onAppear {
                 loadUserProfile()

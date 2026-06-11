@@ -1,28 +1,30 @@
 //
-//  DiscoveryView.swift
+//  DiscoveryViewResponsive.swift
 //  Hidden Shelf
 //
 //  Created by student on 29/05/26.
 //
 
 import SwiftUI
+import FirebaseAuth
+
+extension String: @retroactive Identifiable {
+    public var id: String { self }
+}
 
 struct DiscoveryViewResponsive: View {
     @StateObject private var viewModel = DiscoveryViewModel()
     @State private var showFilterSheet = false
-    
-    // 💡 STATE BARU: Untuk melacak apakah MatchView harus ditampilkan
-    @State private var showMatchView = false
-    @State private var createdMatchId: String? = nil
-    
-    // 💡 Responsive Layout: Mendeteksi jenis layar secara dinamis
+    @State private var matchViewId: String? = nil
+    @State private var currentUserName: String = "Reader"
+
     #if os(macOS)
     private var isRegular: Bool { true }
     #else
     @Environment(\.horizontalSizeClass) var horizontalSizeClass
     private var isRegular: Bool { horizontalSizeClass == .regular }
     #endif
-    
+
     init(previewBooks: [Book]? = nil) {
         if let dummyBooks = previewBooks {
             let vm = DiscoveryViewModel()
@@ -31,13 +33,12 @@ struct DiscoveryViewResponsive: View {
             _viewModel = StateObject(wrappedValue: vm)
         }
     }
-    
+
     var body: some View {
         NavigationView {
             ZStack {
-                // Background utama
                 Color(hex: "E5E0D8").opacity(0.4).ignoresSafeArea()
-                
+
                 if isRegular {
                     // MARK: - TAMPILAN IPAD & MAC
                     VStack(spacing: 0) {
@@ -45,7 +46,7 @@ struct DiscoveryViewResponsive: View {
                             FilterSheetView(viewModel: viewModel, onClose: {})
                                 .frame(width: 320)
                                 .padding(.top, 20)
-                            
+
                             VStack(spacing: 20) {
                                 headerSection
                                 cardStackSection
@@ -54,7 +55,7 @@ struct DiscoveryViewResponsive: View {
                         .padding(30)
                         Spacer().frame(height: 75)
                     }
-                    
+
                 } else {
                     // MARK: - TAMPILAN IPHONE
                     VStack(spacing: 0) {
@@ -70,15 +71,15 @@ struct DiscoveryViewResponsive: View {
                             .transition(.move(edge: .top).combined(with: .opacity))
                             .zIndex(2)
                         }
-                        
+
                         headerSection
                             .padding(.horizontal, 24)
                             .padding(.top, 15)
                             .padding(.bottom, 15)
-                        
+
                         cardStackSection
                             .padding(.horizontal, 24)
-                        
+
                         Spacer().frame(height: 75)
                     }
                 }
@@ -100,31 +101,32 @@ struct DiscoveryViewResponsive: View {
                 }
             }
             .onAppear {
-                // 💡 REAL DATA: Ambil data langsung dari Firebase
                 if viewModel.allBooks.isEmpty {
                     viewModel.loadBooks()
                 }
-            }
-            .fullScreenCover(isPresented: $showMatchView) {
-                // 💡 REAL ID: Buka Match View dengan ID yang baru saja terbuat
-                if let matchId = createdMatchId {
-                    MatchView(matchIdToLoad: matchId)
+                if let user = Auth.auth().currentUser {
+                    currentUserName = user.displayName?.components(separatedBy: " ").first
+                        ?? user.email?.components(separatedBy: "@").first
+                        ?? "Reader"
                 }
+            }
+            .fullScreenCover(item: $matchViewId) { matchId in
+                MatchView(matchIdToLoad: matchId)
             }
         }
     }
-    
+
     // MARK: - EXTRACTED SUBVIEWS
-    
+
     private var headerSection: some View {
         VStack(alignment: .leading, spacing: 12) {
             HStack(alignment: .center) {
                 Text("Hidden Shelf")
                     .font(.system(size: 32, weight: .bold, design: .serif))
                     .foregroundColor(Color(hex: "725C3A"))
-                
+
                 Spacer()
-                
+
                 Image("Reading")
                     .resizable()
                     .scaledToFit()
@@ -136,12 +138,12 @@ struct DiscoveryViewResponsive: View {
                             .offset(y: 5)
                     )
             }
-            
+
             VStack(alignment: .leading, spacing: 6) {
-                Text("Hai, Chelsea!")
+                Text("Hai, \(currentUserName)!")
                     .font(.system(size: 24, weight: .bold, design: .serif))
                     .foregroundColor(Color(hex: "725C3A"))
-                
+
                 Text("Siap menemukan cerita baru hari ini?")
                     .font(.system(size: 14))
                     .foregroundColor(Color(hex: "725C3A").opacity(0.7))
@@ -149,7 +151,7 @@ struct DiscoveryViewResponsive: View {
             .padding(.top, -15)
         }
     }
-    
+
     private var cardStackSection: some View {
         Group {
             if viewModel.filteredBooks.isEmpty {
@@ -177,10 +179,9 @@ struct DiscoveryViewResponsive: View {
             } else {
                 Spacer()
                 ZStack {
-                    // ✅ FIX 1: Array dikonversi ke Array biasa setelah di-reverse agar ForEach tidak bingung
                     ForEach(Array(viewModel.filteredBooks.reversed()), id: \.id) { book in
                         let isTopCard = book.id == viewModel.filteredBooks.first?.id
-                        
+
                         MysteryBookCard(
                             book: book,
                             onSkip: {
@@ -191,10 +192,8 @@ struct DiscoveryViewResponsive: View {
                                 }
                             },
                             onRequestSwap: {
-                                // ✅ FIX 2: Kurung kurawal dibersihkan & distrukturisasi ulang dengan benar
                                 viewModel.requestSwap(for: book) { newMatchId in
-                                    self.createdMatchId = newMatchId
-                                    self.showMatchView = true
+                                    self.matchViewId = newMatchId
                                 }
                             }
                         )
