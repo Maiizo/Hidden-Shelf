@@ -20,7 +20,7 @@ struct DiscoveryViewResponsive: View {
     
     // 💡 STATE BARU: Untuk melacak apakah MatchView harus ditampilkan
     @State private var showMatchView = false
-    @State private var createdMatchId: String? = nil
+    
     // 💡 Responsive Layout: Mendeteksi jenis layar secara dinamis
     #if os(macOS)
     private var isRegular: Bool { true }
@@ -105,19 +105,21 @@ struct DiscoveryViewResponsive: View {
                     }
                 }
             }
-  
-                        .onAppear {
-                            // 💡 REAL DATA: Ambil data langsung dari Firebase
-                            if viewModel.allBooks.isEmpty {
-                                viewModel.loadBooks()
-                            }
-                        }
-                        .fullScreenCover(isPresented: $showMatchView) {
-                            // 💡 REAL ID: Buka Match View dengan ID yang baru saja terbuat
-                            if let matchId = createdMatchId {
-                                MatchView(matchIdToLoad: matchId)
-                            }
-                        }
+            .onAppear {
+                // 💡 PENGGUNAAN DUMMY DATA:
+                // Jika data kosong saat aplikasi dibuka, langsung isi dengan dummy books!
+                if viewModel.allBooks.isEmpty {
+                    viewModel.allBooks = Book.dummyBooks
+                    viewModel.filteredBooks = Book.dummyBooks
+                    
+                    // Kalau Firebase sudah siap, uncomment kode di bawah ini dan hapus dummy di atas
+                    // viewModel.loadBooks()
+                }
+            }
+            // 💡 NAVIGASI KE MATCH VIEW: Membuka layar Match ketika state bernilai true
+            .fullScreenCover(isPresented: $showMatchView) {
+                MatchView()
+            }
         }
     }
     
@@ -197,12 +199,11 @@ struct DiscoveryViewResponsive: View {
                                 }
                             },
                             onRequestSwap: {
-                            
-                                                         viewModel.requestSwap(for: book) { newMatchId in
-                                                             self.createdMatchId = newMatchId
-                                                             self.showMatchView = true
-                                                         }
-                                                     }
+                                // 💡 KONEKSI DIBUAT DI SINI:
+                                // Saat tombol ditekan, tampilkan Match View
+                                showMatchView = true
+                            }
+                        )
                         .background(Color.white)
                         .cornerRadius(24)
                         .shadow(color: Color.black.opacity(0.06), radius: 12, x: 0, y: 6)

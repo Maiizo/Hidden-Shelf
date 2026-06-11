@@ -4,22 +4,21 @@
 //
 //  Created by student on 29/05/26.
 //
+
+import MapKit
 import Foundation
 import CoreLocation
-import FirebaseFirestore
 
 struct Match: Identifiable, Codable {
-    @DocumentID var id: String?
-    var bookId: String
-    var requesterId: String
-    var ownerId: String
+    let id: String
+    let bookId: String
+    let requesterId: String
+    let ownerId: String
+    var status: String // "On the Way", "Arrived", "Swap Complete"
     
-    // 💡 PERUBAHAN: Status dipisah menjadi dua
-    var requesterStatus: Int
-    var ownerStatus: Int
-    
-    var latitude: Double
-    var longitude: Double
+    // Simpan koordinat lokasi ketemuan
+    let latitude: Double
+    let longitude: Double
     
     var coordinate: CLLocationCoordinate2D {
         CLLocationCoordinate2D(latitude: latitude, longitude: longitude)

@@ -28,7 +28,6 @@ class MyShelfViewModel: ObservableObject {
     
     private let apiService = OpenLibraryService()
     private var cancellables = Set<AnyCancellable>()
-    private var shelfListener: ListenerRegistration?
     
     init() {
         $apiSearchQuery
@@ -162,11 +161,8 @@ class MyShelfViewModel: ObservableObject {
     
     // 🔥 FUNGSI FETCH BOOKS YANG SUDAH DIPERBAIKI
     func fetchMyBooks() {
-         // Hapus pendengar lama jika ada, agar tidak double
-         shelfListener?.remove()
-
-      
-       guard let currentUser = Auth.auth().currentUser else {
+        // 🔥 AMBIL USER YANG SEDANG LOGIN
+        guard let currentUser = Auth.auth().currentUser else {
             print("ERROR: Tidak ada user yang login! Tidak bisa mengambil data buku.")
             self.shelfBooks = []
             return
@@ -180,47 +176,40 @@ class MyShelfViewModel: ObservableObject {
                     print("Error fetching books: \(error.localizedDescription)")
                     return
                 }
-                           
-         // 💡 PERUBAHAN: Gunakan addSnapshotListener agar layar My Shelf jadi Real-Time!
-         shelfListener = db.collection("books")
-             .whereField("ownerId", isEqualTo: "currentUser")
-             .addSnapshotListener { snapshot, error in
-                 if let error = error {
-                     print("Error fetching books: \(error.localizedDescription)")
-                     return
-                 }
-
-                 if let snapshot = snapshot {
-                     DispatchQueue.main.async {
-                         // Datanya akan otomatis tertimpa dan merender ulang UI tiap kali ada perubahan di Firebase
-                         self.shelfBooks = snapshot.documents.compactMap { document -> Book? in
-                             let data = document.data()
-                             let timestamp = data["dateAdded"] as? Timestamp
-                             let date = timestamp?.dateValue() ?? Date()
-
-                             let statusString = data["status"] as? String ?? "Available"
-                             let shelfStatus = ShelfStatus(rawValue: statusString) ?? .available
-
-                             return Book(
-                                 id: UUID(),
-                                 firestoreID: document.documentID,
-                                 title: data["title"] as? String ?? "Unknown Title",
-                                 author: data["author"] as? String ?? "Unknown Author",
-                                 genre: data["genre"] as? String ?? "Unknown",
-                                 publisher: data["publisher"] as? String ?? "Unknown",
-                                 pageCount: data["pageCount"] as? Int ?? 0,
-                                 quote: data["quote"] as? String ?? "",
-                                 coverUrl: data["coverUrl"] as? String,
-                                 isAvailable: data["isAvailable"] as? Bool ?? true,
-                                 ownerId: data["ownerId"] as? String ?? "currentUser",
-                                 status: shelfStatus, // Ini sekarang akan otomatis membaca "Swapped"
-                                 dateAdded: date
-                             )
-                         }
-                     }
-                 }
-             }
-     }
+                
+                if let snapshot = snapshot {
+                    DispatchQueue.main.async {
+                        self.shelfBooks = snapshot.documents.compactMap { document -> Book? in
+                            let data = document.data()
+                            let timestamp = data["dateAdded"] as? Timestamp
+                            let date = timestamp?.dateValue() ?? Date()
+                            
+                            let statusString = data["status"] as? String ?? "Available"
+                            let shelfStatus = ShelfStatus(rawValue: statusString) ?? .available
+                            
+                            let ownerId = data["ownerId"] as? String ?? ""
+                            
+                            return Book(
+                                id: UUID(),
+                                firestoreID: document.documentID,
+                                title: data["title"] as? String ?? "Unknown Title",
+                                author: data["author"] as? String ?? "Unknown Author",
+                                genre: data["genre"] as? String ?? "Unknown",
+                                publisher: data["publisher"] as? String ?? "Unknown",
+                                pageCount: data["pageCount"] as? Int ?? 0,
+                                quote: data["quote"] as? String ?? "",
+                                coverUrl: data["coverUrl"] as? String,
+                                isAvailable: data["isAvailable"] as? Bool ?? true,
+                                ownerId: ownerId,
+                                status: shelfStatus,
+                                dateAdded: date
+                            )
+                        }
+                        print("✅ Berhasil mengambil \(self.shelfBooks.count) buku untuk user: \(currentUser.email ?? currentUser.uid)")
+                    }
+                }
+            }
+    }
     
     // MASUKKAN FUNGSI INI DI DALAM CLASS MyShelfViewModel (di bagian paling bawah)
     func updateBook(bookId: UUID, newTitle: String, newAuthor: String, newGenre: String, newPublisher: String, newPageCount: Int, newQuote: String) {

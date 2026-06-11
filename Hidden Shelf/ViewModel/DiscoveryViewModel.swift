@@ -153,29 +153,4 @@ class DiscoveryViewModel: ObservableObject {
         }
         print("------------------------\n")
     }
-    
-    // Membuat dokumen Match baru di Firebase
-    func requestSwap(for book: Book, completion: @escaping (String) -> Void) {
-        let matchRef = db.collection("matches").document() // Bikin ID acak baru
-        
-        let matchData: [String: Any] = [
-            "bookId": book.firestoreID ?? "",
-            "requesterId": "currentUser", // Nanti pakai ID asli
-            "ownerId": book.ownerId,
-            "requesterStatus": 0,
-            "ownerStatus": 0,
-            "latitude": -7.2856, // Opsional: Koordinat UC Surabaya
-            "longitude": 112.6315
-        ]
-        
-        matchRef.setData(matchData) { error in
-            if let error = error {
-                print("Gagal membuat request swap: \(error.localizedDescription)")
-            } else {
-                // Kembalikan ID Match yang baru terbuat ke View
-                completion(matchRef.documentID)
-            }
-        }
-    }
-    
 }
