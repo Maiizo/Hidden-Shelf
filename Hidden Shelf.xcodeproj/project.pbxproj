@@ -64,6 +64,7 @@
 		3F7330D82FC922B700DC4C2D /* Hidden Shelf.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Hidden Shelf.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		3F7330E52FC922B800DC4C2D /* Hidden ShelfTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "Hidden ShelfTests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		3F7330EF2FC922B800DC4C2D /* Hidden ShelfUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "Hidden ShelfUITests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
+		3F7573182FDA6D1E00DDB902 /* HiddenShelfWidgetExtension.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = HiddenShelfWidgetExtension.entitlements; sourceTree = "<group>"; };
 		3F7FCF352FD120FF00CFEB26 /* Hidden Shelf.xctestplan */ = {isa = PBXFileReference; lastKnownFileType = text; path = "Hidden Shelf.xctestplan"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -164,6 +165,7 @@
 		3F7330CF2FC922B600DC4C2D = {
 			isa = PBXGroup;
 			children = (
+				3F7573182FDA6D1E00DDB902 /* HiddenShelfWidgetExtension.entitlements */,
 				3F7FCF352FD120FF00CFEB26 /* Hidden Shelf.xctestplan */,
 				3F7330DA2FC922B700DC4C2D /* Hidden Shelf */,
 				3F7330E82FC922B800DC4C2D /* Hidden ShelfTests */,
@@ -424,8 +426,10 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				ASSETCATALOG_COMPILER_WIDGET_BACKGROUND_COLOR_NAME = WidgetBackground;
+				CODE_SIGN_ENTITLEMENTS = HiddenShelfWidgetExtension.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = S53LBP54K2;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = HiddenShelfWidget/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = HiddenShelfWidget;
@@ -453,8 +457,10 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				ASSETCATALOG_COMPILER_WIDGET_BACKGROUND_COLOR_NAME = WidgetBackground;
+				CODE_SIGN_ENTITLEMENTS = HiddenShelfWidgetExtension.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = S53LBP54K2;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = HiddenShelfWidget/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = HiddenShelfWidget;
@@ -601,8 +607,10 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = "Hidden Shelf/Hidden Shelf.entitlements";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = S53LBP54K2;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
@@ -632,8 +640,10 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = "Hidden Shelf/Hidden Shelf.entitlements";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = S53LBP54K2;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;

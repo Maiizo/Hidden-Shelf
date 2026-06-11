@@ -392,6 +392,8 @@ struct ProfileView: View {
         do {
             try Auth.auth().signOut()
             // Navigate back to login view
+            WidgetSyncManager.clearData()
+            
             if let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
                let window = windowScene.windows.first {
                 window.rootViewController = UIHostingController(rootView: LoginView())

@@ -37,19 +37,48 @@ struct Provider: TimelineProvider {
     }
 
     func getTimeline(in context: Context, completion: @escaping (Timeline<Entry>) -> ()) {
-        let currentDate = Date()
-        let refreshDate = Calendar.current.date(byAdding: .hour, value: 2, to: currentDate)!
-        
-        let entry = SimpleEntry(date: currentDate, book: WidgetBook(
-            id: "dummy_1",
-            quote: "The measure of a man is what he does with power.",
-            genre: "Philosophy",
-            mascotImageName: "Readingflip" // 👈 FIX: Di sini kemarin masih "Reading", makanya crash!
-        ))
-        let timeline = Timeline(entries: [entry], policy: .after(refreshDate))
-        completion(timeline)
+            var entries: [SimpleEntry] = []
+            let currentDate = Date()
+            
+            // 💡 Membaca data dinamis akun aktif yang dikirim dari DiscoveryView via App Group
+            if let sharedDefaults = UserDefaults(suiteName: "group.com.kamu.HiddenShelf"),
+               let rawBooks = sharedDefaults.array(forKey: "topMysteryBooks") as? [[String: String]], !rawBooks.isEmpty {
+                
+                for (index, dict) in rawBooks.enumerated() {
+                    // ⏱️ Membuat antrean: Buku ke-1 tayang sekarang, Buku ke-2 tayang +30 menit, dst.
+                    guard let rilisDate = Calendar.current.date(byAdding: .minute, value: index * 30, to: currentDate) else { continue }
+                    
+                    let widgetBook = WidgetBook(
+                        id: dict["id"] ?? "",
+                        quote: dict["quote"] ?? "No Quote Found",
+                        genre: dict["genre"] ?? "General",
+                        mascotImageName: "Readingflip" // Proteksi dari crash ukuran gambar raksasa
+                    )
+                    
+                    let entry = SimpleEntry(date: rilisDate, book: widgetBook)
+                    entries.append(entry)
+                    
+                    // Batasi antrean timeline (misal maks 6 buku / 3 jam ke depan) agar menghemat baterai iPhone
+                    if entries.count >= 6 { break }
+                }
+            }
+            
+            // Jaga-jaga jika data kosong (belum login / data belum ditarik dari network)
+            if entries.isEmpty {
+                let fallbackEntry = SimpleEntry(date: currentDate, book: WidgetBook(
+                    id: "welcome_state",
+                    quote: "Silakan buka aplikasi Hidden Shelf dan masuk ke akunmu untuk memuat kutipan buku hari ini.",
+                    genre: "Discovery",
+                    mascotImageName: "Readingflip"
+                ))
+                entries.append(fallbackEntry)
+            }
+
+            // Kebijakan .atEnd: Begitu seluruh antrean buku habis tayang, iOS otomatis men-trigger fungsi ini lagi untuk meminta data baru
+            let timeline = Timeline(entries: entries, policy: .atEnd)
+            completion(timeline)
+        }
     }
-}
 
 struct SimpleEntry: TimelineEntry {
     let date: Date
@@ -112,7 +141,7 @@ struct HiddenShelfWidgetEntryView : View {
         }
         .padding(14)
         .containerBackground(Color(hex: "F7F5F0"), for: .widget)
-        .widgetURL(URL(string: "hiddenshelf://book/\(entry.book.id)")!)
+                .widgetURL(URL(string: "hiddenshelf://book/\(entry.book.id)")!)
     }
 }
 

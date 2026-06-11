@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import WidgetKit
 
 struct DiscoveryView: View {
     @StateObject private var viewModel = DiscoveryViewModel()
@@ -36,7 +37,7 @@ struct DiscoveryView: View {
                             }
                         })
                         .padding(.horizontal, 24)
-                        .padding(.top, 90) 
+                        .padding(.top, 90)
                         .padding(.bottom, 15)
                         .transition(.move(edge: .top).combined(with: .opacity))
                         .zIndex(2) // Memastikan filter selalu berada di layer teratas
@@ -166,9 +167,47 @@ struct DiscoveryView: View {
             .onAppear {
                 if viewModel.allBooks.isEmpty {
                     viewModel.loadBooks()
+                } else {
+                    // Sinkronisasi data awal saat layar muncul
+                    WidgetSyncManager.syncBooks(viewModel.filteredBooks)
                 }
+            }
+            
+            // 💡 REAKTIF: Setiap kali ada kartu di-skip atau preferensi filter berubah, data widget langsung ikut update!
+            .onChange(of: viewModel.filteredBooks.count) { _ in
+                WidgetSyncManager.syncBooks(viewModel.filteredBooks)
             }
         }
     }
 }
 
+// MARK: - WIDGET SYNC MANAGER
+/// Komponen bantuan untuk menjembatani pengiriman data ke App Group Sandbox Widget
+struct WidgetSyncManager {
+    static let suiteName = "group.com.kamu.HiddenShelf" // ⚠️ Pastikan ini sesuai dengan di Capabilities Xcode
+    static let key = "topMysteryBooks"
+
+    static func syncBooks(_ books: [Book]) {
+        // Ambil atribut penting dan petakan menjadi array dictionary dasar
+        let sharedData = books.map { book -> [String: String] in
+            return [
+                "id": book.firestoreID ?? book.id.uuidString,
+                "quote": book.quote,
+                "genre": book.genre
+            ]
+        }
+        
+        if let sharedDefaults = UserDefaults(suiteName: suiteName) {
+            sharedDefaults.set(sharedData, forKey: key)
+            // Paksa widget untuk bangun dan mengganti antrean datanya saat ini juga
+            WidgetCenter.shared.reloadAllTimelines()
+        }
+    }
+
+    static func clearData() {
+        if let sharedDefaults = UserDefaults(suiteName: suiteName) {
+            sharedDefaults.removeObject(forKey: key)
+            WidgetCenter.shared.reloadAllTimelines()
+        }
+    }
+}

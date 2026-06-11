@@ -15,7 +15,7 @@ struct ContentView: View {
     var body: some View {
         TabView(selection: $selectedTab) {
             // Tab 1: Discovery (Landing Page)
-            DiscoveryViewResponsive()
+            DiscoveryView()
                 .tabItem {
                     Label("Discovery", systemImage: "magnifyingglass")
                 }
