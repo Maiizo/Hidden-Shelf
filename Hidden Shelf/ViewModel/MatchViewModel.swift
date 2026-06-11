@@ -2,125 +2,163 @@
 //  MatchViewModel.swift
 //  Hidden Shelf
 //
-//  Created by student on 29/05/26.
-//
-// MatchViewModel.swift
+
 import Foundation
 import Combine
 import MapKit
 import FirebaseFirestore
+import FirebaseAuth
 
 @MainActor
 class MatchViewModel: ObservableObject {
     @Published var currentMatch: Match?
-    
-    // 💡 PERUBAHAN: Variabel status dipisah untuk UI
     @Published var myStatusStep: Int = 0
     @Published var partnerStatusStep: Int = 0
     @Published var showConfirmationPopup: Bool = false
-    
     @Published var region = MKCoordinateRegion(
         center: CLLocationCoordinate2D(latitude: -7.2856, longitude: 112.6315),
         span: MKCoordinateSpan(latitudeDelta: 0.01, longitudeDelta: 0.01)
     )
-    
+
     private var db = Firestore.firestore()
     private var listenerRegistration: ListenerRegistration?
-    
-    let currentUserId = "partnerUser" // Nanti ini diganti dengan ID Firebase Auth asli
+
+    // Always reads the real logged-in user's UID live
+    private var currentUserId: String {
+        Auth.auth().currentUser?.uid ?? ""
+    }
 
     func listenToMatch(matchId: String) {
-            let docRef = db.collection("matches").document(matchId)
-            
-            listenerRegistration = docRef.addSnapshotListener { [weak self] snapshot, error in
-                guard let self = self else { return }
-                
-                if let error = error {
-                    print("Error mendengarkan match: \(error.localizedDescription)")
-                    return
-                }
-                
-                guard let document = snapshot, document.exists else {
-                    print("Dokumen match tidak ditemukan!")
-                    return
-                }
-                
-                do {
-                    let match = try document.data(as: Match.self)
-                    self.currentMatch = match
-                    self.region.center = match.coordinate
-                    
-                    if match.ownerId == self.currentUserId {
-                        self.myStatusStep = match.ownerStatus
-                        self.partnerStatusStep = match.requesterStatus
-                    } else {
-                        self.myStatusStep = match.requesterStatus
-                        self.partnerStatusStep = match.ownerStatus
-                    }
-                } catch {
-                    print("Error decoding match data: \(error.localizedDescription)")
-                }
+        // Remove any existing listener first
+        listenerRegistration?.remove()
+
+        let docRef = db.collection("matches").document(matchId)
+
+        listenerRegistration = docRef.addSnapshotListener { [weak self] snapshot, error in
+            guard let self = self else { return }
+
+            if let error = error {
+                print("❌ Error listening to match: \(error.localizedDescription)")
+                return
             }
-        }
-    
-    func nextStep() {
-        if myStatusStep < 2 {
-            myStatusStep += 1
-            if myStatusStep == 2 {
-                showConfirmationPopup = true
+
+            guard let document = snapshot, document.exists,
+                  let data = document.data() else {
+                print("❌ Match document not found or empty")
+                return
+            }
+
+            // Read fields manually — avoids Codable @DocumentID silent failures
+            let bookId        = data["bookId"] as? String ?? ""
+            let requesterId   = data["requesterId"] as? String ?? ""
+            let ownerId       = data["ownerId"] as? String ?? ""
+            let requesterStatus = data["requesterStatus"] as? Int ?? 0
+            let ownerStatus     = data["ownerStatus"] as? Int ?? 0
+            let latitude      = data["latitude"] as? Double ?? -7.2856
+            let longitude     = data["longitude"] as? Double ?? 112.6315
+
+            print("📡 Match update received:")
+            print("   requesterId: \(requesterId)")
+            print("   ownerId: \(ownerId)")
+            print("   requesterStatus: \(requesterStatus)")
+            print("   ownerStatus: \(ownerStatus)")
+            print("   currentUserId: \(self.currentUserId)")
+
+            // Build the Match object
+            let match = Match(
+                id: document.documentID,
+                bookId: bookId,
+                requesterId: requesterId,
+                ownerId: ownerId,
+                requesterStatus: requesterStatus,
+                ownerStatus: ownerStatus,
+                latitude: latitude,
+                longitude: longitude
+            )
+
+            self.currentMatch = match
+            self.region.center = CLLocationCoordinate2D(latitude: latitude, longitude: longitude)
+
+            // Assign my vs partner status based on who I am
+            if self.currentUserId == ownerId {
+                self.myStatusStep      = ownerStatus
+                self.partnerStatusStep = requesterStatus
+                print("   👤 I am the OWNER")
             } else {
-                updateMyStatusToFirebase()
+                self.myStatusStep      = requesterStatus
+                self.partnerStatusStep = ownerStatus
+                print("   👤 I am the REQUESTER")
             }
+
+            print("   ✅ myStatus: \(self.myStatusStep), partnerStatus: \(self.partnerStatusStep)")
         }
     }
-    
-    func completeSwap() {
-            myStatusStep = 2
-            updateMyStatusToFirebase()
-            
-            // 💡 TAMBAHAN BARU: Panggil fungsi untuk mengubah status buku di database
-            updateBookStatusToSwapped()
-        }
 
-    private func updateBookStatusToSwapped() {
-            guard let match = currentMatch else { return }
-            
-            // Update dokumen buku berdasarkan bookId yang ada di Match
-            db.collection("books").document(match.bookId).updateData([
-                "status": ShelfStatus.swapped.rawValue,
-                "isAvailable": false // Ubah ke false agar tidak muncul lagi di layar Discovery orang lain
-            ]) { error in
-                if let error = error {
-                    print("Gagal mengubah status buku: \(error.localizedDescription)")
-                } else {
-                    print("Buku berhasil dipindah ke kategori Swapped di database!")
-                }
-            }
+    func nextStep() {
+        guard myStatusStep < 2 else { return }
+        myStatusStep += 1
+        if myStatusStep == 2 {
+            showConfirmationPopup = true
+        } else {
+            updateMyStatusToFirebase()
         }
+    }
+
+    func completeSwap() {
+        myStatusStep = 2
+        updateMyStatusToFirebase()
+        updateBookStatusToSwapped()
+    }
 
     func resetSwap() {
         myStatusStep = 1
         showConfirmationPopup = false
         updateMyStatusToFirebase()
     }
-    
-    // 💡 FUNGSI BARU: Mengirim status KAMU saja ke Firebase
+
     private func updateMyStatusToFirebase() {
-        guard let match = currentMatch, let matchId = match.id else { return }
-        
-        let fieldToUpdate = (match.ownerId == currentUserId) ? "ownerStatus" : "requesterStatus"
-        
+        guard let match = currentMatch, let matchId = match.id else {
+            print("❌ Cannot update — match or matchId is nil")
+            return
+        }
+
+        // Decide which field belongs to me
+        let fieldToUpdate: String
+        if currentUserId == match.ownerId {
+            fieldToUpdate = "ownerStatus"
+        } else {
+            fieldToUpdate = "requesterStatus"
+        }
+
+        print("📤 Updating \(fieldToUpdate) → \(myStatusStep) for match \(matchId)")
+
         db.collection("matches").document(matchId).updateData([
             fieldToUpdate: myStatusStep
         ]) { error in
             if let error = error {
-                print("Gagal update status: \(error.localizedDescription)")
+                print("❌ Failed to update status: \(error.localizedDescription)")
+            } else {
+                print("✅ Status updated successfully")
             }
         }
     }
-    
+
+    private func updateBookStatusToSwapped() {
+        guard let match = currentMatch else { return }
+
+        db.collection("books").document(match.bookId).updateData([
+            "status": ShelfStatus.swapped.rawValue,
+            "isAvailable": false
+        ]) { error in
+            if let error = error {
+                print("❌ Failed to update book status: \(error.localizedDescription)")
+            } else {
+                print("✅ Book moved to Swapped")
+            }
+        }
+    }
+
     deinit {
-        // Matikan listener kalau pindah layar agar tidak boros internet
         listenerRegistration?.remove()
     }
 }

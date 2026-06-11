@@ -160,7 +160,7 @@ class MyShelfViewModel: ObservableObject {
         }
     }
     
-    // 🔥 FUNGSI FETCH BOOKS YANG SUDAH DIPERBAIKI (Real-Time & Bersih)
+    // 🔥 FUNGSI FETCH BOOKS YANG SUDAH DIPERBAIKI (Real-Time & Bebas Error)
         func fetchMyBooks() {
             // Hapus pendengar lama jika ada, agar tidak double
             shelfListener?.remove()
@@ -171,9 +171,9 @@ class MyShelfViewModel: ObservableObject {
                 return
             }
             
-            // 💡 Langsung gunakan addSnapshotListener dengan UID asli agar Real-Time
+            // 💡 PERUBAHAN: Gunakan addSnapshotListener dengan UID ASLI
             self.shelfListener = self.db.collection("books")
-                .whereField("ownerId", isEqualTo: currentUser.uid)
+                .whereField("ownerId", isEqualTo: currentUser.uid) // ✅ MENGGUNAKAN UID ASLI, BUKAN "currentUser"
                 .addSnapshotListener { [weak self] snapshot, error in
                     guard let self = self else { return }
                     
@@ -184,7 +184,7 @@ class MyShelfViewModel: ObservableObject {
                     
                     if let snapshot = snapshot {
                         DispatchQueue.main.async {
-                            // Datanya otomatis tertimpa dan merender ulang UI tiap ada perubahan di Firebase
+                            // Datanya akan otomatis tertimpa dan merender ulang UI tiap kali ada perubahan di Firebase
                             self.shelfBooks = snapshot.documents.compactMap { document -> Book? in
                                 let data = document.data()
                                 let timestamp = data["dateAdded"] as? Timestamp
@@ -212,9 +212,9 @@ class MyShelfViewModel: ObservableObject {
                         }
                     }
                 }
-        } // ✅ AKHIR DARI FUNGSI FETCH
+        } // ✅ AKHIR DARI FUNGSI FETCH (TIDAK ADA FUNGSI LAIN DI DALAM SINI)
         
-        // 🔥 FUNGSI UPDATE BUKU (SEKARANG SUDAH BERADA DI LUAR FETCH)
+        // 🔥 FUNGSI UPDATE BUKU (SUDAH DI LUAR)
         func updateBook(bookId: UUID, newTitle: String, newAuthor: String, newGenre: String, newPublisher: String, newPageCount: Int, newQuote: String) {
             
             // 1. Cari buku berdasarkan UUID lokal
@@ -250,4 +250,4 @@ class MyShelfViewModel: ObservableObject {
             }
         } // ✅ AKHIR DARI FUNGSI UPDATE
 
-    } // ✅ AKHIR DARI CLASS
+    } // ✅ AKHIR DARI CLASS MyShelfViewModel

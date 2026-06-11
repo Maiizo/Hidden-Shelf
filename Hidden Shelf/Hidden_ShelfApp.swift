@@ -20,20 +20,28 @@ class AppDelegate: NSObject, UIApplicationDelegate {
 struct Hidden_ShelfApp: App {
     // Register the AppDelegate
     @UIApplicationDelegateAdaptor(AppDelegate.self) var delegate
-
+    @StateObject private var authManager = AuthStateManager()
+    
     var body: some Scene {
         WindowGroup {
-            // FIXED: Sekarang panggil ContentView yang sudah berisi TabView
-            ContentView()
-                .onOpenURL { url in
-                    // Cek apakah URL-nya dari widget kita
-                    if url.scheme == "hiddenshelf" && url.host == "book" {
-                        let bookId = url.lastPathComponent
-                        print("User membuka aplikasi dari widget untuk Buku ID: \(bookId)")
-                        
-                        // TODO: Tambahkan logika jika ingin otomatis pindah tab atau buka detail buku
-                    }
-                }
+            if authManager.isLoggedIn {
+                          ContentView()
+                              .environmentObject(authManager)
+                              .onOpenURL { url in
+                                  // Cek apakah URL-nya dari widget kita
+                                  if url.scheme == "hiddenshelf" && url.host == "book" {
+                                      let bookId = url.lastPathComponent
+                                      print("User membuka aplikasi dari widget untuk Buku ID: \(bookId)")
+                                      
+                                      // TODO: Tambahkan logika jika ingin otomatis pindah tab atau buka detail buku
+                                  }
+                              }
+                      } else {
+                          LoginView()
+                              .environmentObject(authManager)
+                      }
+      
+         
         }
     }
 }
