@@ -15,7 +15,7 @@ struct HiddenShelfWidgetControl: ControlWidget {
     var body: some ControlWidgetConfiguration {
         AppIntentControlConfiguration(
             kind: Self.kind,
-            provider: Provider()
+            provider: ControlProvider() // 👈 FIX: Diubah dari Provider() menjadi nama baru yang unik
         ) { value in
             ControlWidgetToggle(
                 "Start Timer",
@@ -36,7 +36,8 @@ extension HiddenShelfWidgetControl {
         var name: String
     }
 
-    struct Provider: AppIntentControlValueProvider {
+    // 👈 FIX: Nama struct diubah menjadi ControlProvider agar tidak bentrok dengan TimelineProvider milik widget utama
+    struct ControlProvider: AppIntentControlValueProvider {
         func previewValue(configuration: TimerConfiguration) -> Value {
             HiddenShelfWidgetControl.Value(isRunning: false, name: configuration.timerName)
         }

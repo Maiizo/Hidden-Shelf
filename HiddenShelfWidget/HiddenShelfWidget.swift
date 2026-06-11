@@ -132,12 +132,12 @@ struct HiddenShelfWidget: Widget {
 
 // MARK: - PREVIEW AREA
 #Preview(as: .systemMedium) {
-    HiddenShelfWidget()
+    HiddenShelfWidget() // Menyambungkan langsung ke konfigurasi utama widget
 } timeline: {
     SimpleEntry(
         date: Date(),
         book: WidgetBook(
-            id: "dummy_preview",
+            id: "preview_1",
             quote: "The measure of a man is what he does with power.",
             genre: "Philosophy",
             mascotImageName: "Readingflip"
@@ -146,7 +146,7 @@ struct HiddenShelfWidget: Widget {
     SimpleEntry(
         date: Date(),
         book: WidgetBook(
-            id: "dummy_preview_2",
+            id: "preview_2",
             quote: "In the depths of winter, I finally learned that within me there lay an invincible summer.",
             genre: "Classic",
             mascotImageName: "Readingflip"
