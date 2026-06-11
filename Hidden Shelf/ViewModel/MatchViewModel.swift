@@ -29,7 +29,7 @@ class MatchViewModel: ObservableObject {
     
     let currentUserId = "partnerUser" // Nanti ini diganti dengan ID Firebase Auth asli
 
-        func listenToMatch(matchId: String) {
+    func listenToMatch(matchId: String) {
             let docRef = db.collection("matches").document(matchId)
             
             listenerRegistration = docRef.addSnapshotListener { [weak self] snapshot, error in
@@ -40,30 +40,16 @@ class MatchViewModel: ObservableObject {
                     return
                 }
                 
-                guard let document = snapshot else { return }
-                
-                // 💡 AUTO-CREATE: Jika data belum ada di Firebase, buat otomatis!
-                if !document.exists {
-                    print("Dokumen belum ada, membuat data dummy ke Firebase...")
-                    docRef.setData([
-                        "bookId": "buku_misteri_123",
-                        "requesterId": "partnerUser", // ID Partner
-                        "ownerId": self.currentUserId, // ID Kamu ("currentUser")
-                        "requesterStatus": 0,
-                        "ownerStatus": 0,
-                        "latitude": -7.2856, // Koordinat UC Surabaya
-                        "longitude": 112.6315
-                    ])
-                    return // Berhenti di sini, fungsi ini akan otomatis terpanggil lagi setelah data terbuat
+                guard let document = snapshot, document.exists else {
+                    print("Dokumen match tidak ditemukan!")
+                    return
                 }
                 
-                // Jika data sudah ada, langsung proses (Real-Time Sync)
                 do {
                     let match = try document.data(as: Match.self)
                     self.currentMatch = match
                     self.region.center = match.coordinate
                     
-                    // Logika penentu: Apakah kamu Owner atau Requester?
                     if match.ownerId == self.currentUserId {
                         self.myStatusStep = match.ownerStatus
                         self.partnerStatusStep = match.requesterStatus
@@ -89,10 +75,29 @@ class MatchViewModel: ObservableObject {
     }
     
     func completeSwap() {
-        myStatusStep = 2
-        updateMyStatusToFirebase()
-    }
-    
+            myStatusStep = 2
+            updateMyStatusToFirebase()
+            
+            // 💡 TAMBAHAN BARU: Panggil fungsi untuk mengubah status buku di database
+            updateBookStatusToSwapped()
+        }
+
+    private func updateBookStatusToSwapped() {
+            guard let match = currentMatch else { return }
+            
+            // Update dokumen buku berdasarkan bookId yang ada di Match
+            db.collection("books").document(match.bookId).updateData([
+                "status": ShelfStatus.swapped.rawValue,
+                "isAvailable": false // Ubah ke false agar tidak muncul lagi di layar Discovery orang lain
+            ]) { error in
+                if let error = error {
+                    print("Gagal mengubah status buku: \(error.localizedDescription)")
+                } else {
+                    print("Buku berhasil dipindah ke kategori Swapped di database!")
+                }
+            }
+        }
+
     func resetSwap() {
         myStatusStep = 1
         showConfirmationPopup = false
