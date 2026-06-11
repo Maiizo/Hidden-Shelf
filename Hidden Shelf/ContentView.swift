@@ -27,6 +27,12 @@ struct ContentView: View {
                     Label("My Shelf", systemImage: "books.vertical.fill")
                 }
                 .tag(1)
+            
+            ProfileView()
+                .tabItem {
+                    Image(systemName: "person")
+                    Text("Profile")
+                }
         }
         // Opsional: Mewarnai ikon tab yang aktif pakai warna Theme kamu biar senada!
         .accentColor(Theme.carob)

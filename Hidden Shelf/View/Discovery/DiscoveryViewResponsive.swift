@@ -5,13 +5,6 @@
 //  Created by student on 29/05/26.
 //
 
-//
-//  DiscoveryView.swift
-//  Hidden Shelf
-//
-//  Created by student on 29/05/26.
-//
-
 import SwiftUI
 
 struct DiscoveryViewResponsive: View {
@@ -21,6 +14,7 @@ struct DiscoveryViewResponsive: View {
     // 💡 STATE BARU: Untuk melacak apakah MatchView harus ditampilkan
     @State private var showMatchView = false
     @State private var createdMatchId: String? = nil
+    
     // 💡 Responsive Layout: Mendeteksi jenis layar secara dinamis
     #if os(macOS)
     private var isRegular: Bool { true }
@@ -105,19 +99,18 @@ struct DiscoveryViewResponsive: View {
                     }
                 }
             }
-  
-                        .onAppear {
-                            // 💡 REAL DATA: Ambil data langsung dari Firebase
-                            if viewModel.allBooks.isEmpty {
-                                viewModel.loadBooks()
-                            }
-                        }
-                        .fullScreenCover(isPresented: $showMatchView) {
-                            // 💡 REAL ID: Buka Match View dengan ID yang baru saja terbuat
-                            if let matchId = createdMatchId {
-                                MatchView(matchIdToLoad: matchId)
-                            }
-                        }
+            .onAppear {
+                // 💡 REAL DATA: Ambil data langsung dari Firebase
+                if viewModel.allBooks.isEmpty {
+                    viewModel.loadBooks()
+                }
+            }
+            .fullScreenCover(isPresented: $showMatchView) {
+                // 💡 REAL ID: Buka Match View dengan ID yang baru saja terbuat
+                if let matchId = createdMatchId {
+                    MatchView(matchIdToLoad: matchId)
+                }
+            }
         }
     }
     
@@ -184,7 +177,8 @@ struct DiscoveryViewResponsive: View {
             } else {
                 Spacer()
                 ZStack {
-                    ForEach(viewModel.filteredBooks.reversed(), id: \.id) { book in
+                    // ✅ FIX 1: Array dikonversi ke Array biasa setelah di-reverse agar ForEach tidak bingung
+                    ForEach(Array(viewModel.filteredBooks.reversed()), id: \.id) { book in
                         let isTopCard = book.id == viewModel.filteredBooks.first?.id
                         
                         MysteryBookCard(
@@ -197,12 +191,13 @@ struct DiscoveryViewResponsive: View {
                                 }
                             },
                             onRequestSwap: {
-                            
-                                                         viewModel.requestSwap(for: book) { newMatchId in
-                                                             self.createdMatchId = newMatchId
-                                                             self.showMatchView = true
-                                                         }
-                                                     }
+                                // ✅ FIX 2: Kurung kurawal dibersihkan & distrukturisasi ulang dengan benar
+                                viewModel.requestSwap(for: book) { newMatchId in
+                                    self.createdMatchId = newMatchId
+                                    self.showMatchView = true
+                                }
+                            }
+                        )
                         .background(Color.white)
                         .cornerRadius(24)
                         .shadow(color: Color.black.opacity(0.06), radius: 12, x: 0, y: 6)

@@ -160,102 +160,94 @@ class MyShelfViewModel: ObservableObject {
         }
     }
     
-    // 🔥 FUNGSI FETCH BOOKS YANG SUDAH DIPERBAIKI
-    func fetchMyBooks() {
-         // Hapus pendengar lama jika ada, agar tidak double
-         shelfListener?.remove()
-
-      
-       guard let currentUser = Auth.auth().currentUser else {
-            print("ERROR: Tidak ada user yang login! Tidak bisa mengambil data buku.")
-            self.shelfBooks = []
-            return
-        }
-        
-        // 🔥 FILTER: HANYA buku milik user yang sedang login
-        db.collection("books")
-            .whereField("ownerId", isEqualTo: currentUser.uid)  // 🔥 PAKAI UID ASLI
-            .getDocuments { snapshot, error in
-                if let error = error {
-                    print("Error fetching books: \(error.localizedDescription)")
-                    return
-                }
-                           
-         // 💡 PERUBAHAN: Gunakan addSnapshotListener agar layar My Shelf jadi Real-Time!
-         shelfListener = db.collection("books")
-             .whereField("ownerId", isEqualTo: "currentUser")
-             .addSnapshotListener { snapshot, error in
-                 if let error = error {
-                     print("Error fetching books: \(error.localizedDescription)")
-                     return
-                 }
-
-                 if let snapshot = snapshot {
-                     DispatchQueue.main.async {
-                         // Datanya akan otomatis tertimpa dan merender ulang UI tiap kali ada perubahan di Firebase
-                         self.shelfBooks = snapshot.documents.compactMap { document -> Book? in
-                             let data = document.data()
-                             let timestamp = data["dateAdded"] as? Timestamp
-                             let date = timestamp?.dateValue() ?? Date()
-
-                             let statusString = data["status"] as? String ?? "Available"
-                             let shelfStatus = ShelfStatus(rawValue: statusString) ?? .available
-
-                             return Book(
-                                 id: UUID(),
-                                 firestoreID: document.documentID,
-                                 title: data["title"] as? String ?? "Unknown Title",
-                                 author: data["author"] as? String ?? "Unknown Author",
-                                 genre: data["genre"] as? String ?? "Unknown",
-                                 publisher: data["publisher"] as? String ?? "Unknown",
-                                 pageCount: data["pageCount"] as? Int ?? 0,
-                                 quote: data["quote"] as? String ?? "",
-                                 coverUrl: data["coverUrl"] as? String,
-                                 isAvailable: data["isAvailable"] as? Bool ?? true,
-                                 ownerId: data["ownerId"] as? String ?? "currentUser",
-                                 status: shelfStatus, // Ini sekarang akan otomatis membaca "Swapped"
-                                 dateAdded: date
-                             )
-                         }
-                     }
-                 }
-             }
-     }
-    
-    // MASUKKAN FUNGSI INI DI DALAM CLASS MyShelfViewModel (di bagian paling bawah)
-    func updateBook(bookId: UUID, newTitle: String, newAuthor: String, newGenre: String, newPublisher: String, newPageCount: Int, newQuote: String) {
-        
-        // 1. Cari buku berdasarkan UUID lokal
-        if let index = self.shelfBooks.firstIndex(where: { $0.id == bookId }) {
+    // 🔥 FUNGSI FETCH BOOKS YANG SUDAH DIPERBAIKI (Real-Time & Bersih)
+        func fetchMyBooks() {
+            // Hapus pendengar lama jika ada, agar tidak double
+            shelfListener?.remove()
             
-            // 2. Update data lokal (Optimistic UI)
-            self.shelfBooks[index].title = newTitle
-            self.shelfBooks[index].author = newAuthor
-            self.shelfBooks[index].genre = newGenre
-            self.shelfBooks[index].publisher = newPublisher
-            self.shelfBooks[index].pageCount = newPageCount
-            self.shelfBooks[index].quote = newQuote
-           
-            // 3. Update ke database MENGGUNAKAN firestoreID
-            if let firestoreID = self.shelfBooks[index].firestoreID, !firestoreID.isEmpty {
-                db.collection("books").document(firestoreID).updateData([
-                    "title": newTitle,
-                    "author": newAuthor,
-                    "genre": newGenre,
-                    "publisher": newPublisher,
-                    "pageCount": newPageCount,
-                    "quote": newQuote
-                ]) { error in
+            guard let currentUser = Auth.auth().currentUser else {
+                print("ERROR: Tidak ada user yang login! Tidak bisa mengambil data buku.")
+                self.shelfBooks = []
+                return
+            }
+            
+            // 💡 Langsung gunakan addSnapshotListener dengan UID asli agar Real-Time
+            self.shelfListener = self.db.collection("books")
+                .whereField("ownerId", isEqualTo: currentUser.uid)
+                .addSnapshotListener { [weak self] snapshot, error in
+                    guard let self = self else { return }
+                    
                     if let error = error {
-                        print("❌ Gagal update buku di Firebase: \(error.localizedDescription)")
-                    } else {
-                        print("✅ Buku berhasil diupdate di Firebase!")
+                        print("Error fetching books: \(error.localizedDescription)")
+                        return
+                    }
+                    
+                    if let snapshot = snapshot {
+                        DispatchQueue.main.async {
+                            // Datanya otomatis tertimpa dan merender ulang UI tiap ada perubahan di Firebase
+                            self.shelfBooks = snapshot.documents.compactMap { document -> Book? in
+                                let data = document.data()
+                                let timestamp = data["dateAdded"] as? Timestamp
+                                let date = timestamp?.dateValue() ?? Date()
+                                
+                                let statusString = data["status"] as? String ?? "Available"
+                                let shelfStatus = ShelfStatus(rawValue: statusString) ?? .available
+                                
+                                return Book(
+                                    id: UUID(),
+                                    firestoreID: document.documentID,
+                                    title: data["title"] as? String ?? "Unknown Title",
+                                    author: data["author"] as? String ?? "Unknown Author",
+                                    genre: data["genre"] as? String ?? "Unknown",
+                                    publisher: data["publisher"] as? String ?? "Unknown",
+                                    pageCount: data["pageCount"] as? Int ?? 0,
+                                    quote: data["quote"] as? String ?? "",
+                                    coverUrl: data["coverUrl"] as? String,
+                                    isAvailable: data["isAvailable"] as? Bool ?? true,
+                                    ownerId: data["ownerId"] as? String ?? "unknownUser",
+                                    status: shelfStatus,
+                                    dateAdded: date
+                                )
+                            }
+                        }
                     }
                 }
-            } else {
-                print("⚠️ Buku ini belum tersinkronisasi dengan Firestore (firestoreID kosong).")
+        } // ✅ AKHIR DARI FUNGSI FETCH
+        
+        // 🔥 FUNGSI UPDATE BUKU (SEKARANG SUDAH BERADA DI LUAR FETCH)
+        func updateBook(bookId: UUID, newTitle: String, newAuthor: String, newGenre: String, newPublisher: String, newPageCount: Int, newQuote: String) {
+            
+            // 1. Cari buku berdasarkan UUID lokal
+            if let index = self.shelfBooks.firstIndex(where: { $0.id == bookId }) {
+                
+                // 2. Update data lokal (Optimistic UI)
+                self.shelfBooks[index].title = newTitle
+                self.shelfBooks[index].author = newAuthor
+                self.shelfBooks[index].genre = newGenre
+                self.shelfBooks[index].publisher = newPublisher
+                self.shelfBooks[index].pageCount = newPageCount
+                self.shelfBooks[index].quote = newQuote
+                
+                // 3. Update ke database MENGGUNAKAN firestoreID
+                if let firestoreID = self.shelfBooks[index].firestoreID, !firestoreID.isEmpty {
+                    db.collection("books").document(firestoreID).updateData([
+                        "title": newTitle,
+                        "author": newAuthor,
+                        "genre": newGenre,
+                        "publisher": newPublisher,
+                        "pageCount": newPageCount,
+                        "quote": newQuote
+                    ]) { error in
+                        if let error = error {
+                            print("❌ Gagal update buku di Firebase: \(error.localizedDescription)")
+                        } else {
+                            print("✅ Buku berhasil diupdate di Firebase!")
+                        }
+                    }
+                } else {
+                    print("⚠️ Buku ini belum tersinkronisasi dengan Firestore (firestoreID kosong).")
+                }
             }
-        }
-    }
-    
-}
+        } // ✅ AKHIR DARI FUNGSI UPDATE
+
+    } // ✅ AKHIR DARI CLASS
