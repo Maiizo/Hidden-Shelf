@@ -14,8 +14,8 @@ class OpenLibraryService {
         let urlString = "https://openlibrary.org/search.json?q=\(sanitizedQuery)&limit=7"
         
         guard let url = URL(string: urlString) else {
-                    throw URLError(.badURL)
-                }
+            throw URLError(.badURL)
+        }
         
         let (data, response) = try await URLSession.shared.data(from: url)
         

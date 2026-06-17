@@ -22,7 +22,7 @@ struct AddNewBookForm: View {
         NavigationView {
             ZStack {
                 // Background base color
-                Color.appAlmond.ignoresSafeArea()
+                Theme.almond.ignoresSafeArea()
                 
                 ScrollView {
                     VStack(spacing: 20) {
@@ -31,15 +31,15 @@ struct AddNewBookForm: View {
                         VStack(alignment: .leading, spacing: 10) {
                             Text("AUTO-FILL SEARCH")
                                 .font(.system(size: 11, weight: .bold, design: .rounded))
-                                .foregroundColor(.appCarob.opacity(0.6))
+                                .foregroundColor(Theme.carob.opacity(0.6))
                                 .padding(.leading, 4)
                             
                             HStack {
                                 Image(systemName: "magnifyingglass")
-                                    .foregroundColor(.appCarob.opacity(0.7))
+                                    .foregroundColor(Theme.carob.opacity(0.7))
                                 TextField("Type title here to look up...", text: $viewModel.apiSearchQuery)
                                     .font(.system(.body, design: .rounded))
-                                    .foregroundColor(.appCarob)
+                                    .foregroundColor(Theme.carob)
                                 
                                 if viewModel.isSearchingAPI {
                                     ProgressView()
@@ -47,7 +47,7 @@ struct AddNewBookForm: View {
                                 }
                             }
                             .padding(14)
-                            .background(Color.appAlmond)
+                            .background(Theme.almond)
                             .cornerRadius(12)
                             
                             // Replace the floating dropdown section in your AddNewBookForm with this:
@@ -68,7 +68,7 @@ struct AddNewBookForm: View {
                                                 if let urlStr = doc.formattedCoverUrl, let url = URL(string: urlStr) {
                                                     CachedAsyncImage(url: url) {
                                                         RoundedRectangle(cornerRadius: 4)
-                                                            .fill(Color.appPistache.opacity(0.3))
+                                                            .fill(Theme.pistache.opacity(0.3))
                                                     }
                                                     .aspectRatio(contentMode: .fill)
                                                     .frame(width: 24, height: 34)
@@ -76,19 +76,19 @@ struct AddNewBookForm: View {
                                                     .clipped()
                                                 } else {
                                                     RoundedRectangle(cornerRadius: 4)
-                                                        .fill(Color.appPistache.opacity(0.4))
+                                                        .fill(Theme.pistache.opacity(0.4))
                                                         .frame(width: 24, height: 34)
                                                 }
                                                 
                                                 VStack(alignment: .leading, spacing: 2) {
                                                     Text(doc.title)
                                                         .font(.system(size: 13, weight: .bold, design: .rounded))
-                                                        .foregroundColor(.appCarob)
+                                                        .foregroundColor(Theme.carob)
                                                         .lineLimit(1)
                                                     // FIXED: Removed the 0 hlm page count string from the preview
                                                     Text(doc.firstAuthor)
                                                         .font(.system(size: 11, design: .rounded))
-                                                        .foregroundColor(.appCarob.opacity(0.6))
+                                                        .foregroundColor(Theme.carob.opacity(0.6))
                                                         .lineLimit(1)
                                                 }
                                                 
@@ -96,18 +96,18 @@ struct AddNewBookForm: View {
                                                 
                                                 Image(systemName: "arrow.down.circle.fill")
                                                     .font(.system(size: 16))
-                                                    .foregroundColor(.appMatcha)
+                                                    .foregroundColor(Theme.matcha)
                                             }
                                             .padding(.vertical, 8)
                                             .padding(.horizontal, 10)
                                         }
                                         
                                         if doc.id != viewModel.apiResults.last?.id {
-                                            Divider().background(Color.appAlmond.opacity(0.6))
+                                            Divider().background(Theme.almond.opacity(0.6))
                                         }
                                     }
                                 }
-                                .background(Color.appAlmond.opacity(0.4))
+                                .background(Theme.almond.opacity(0.4))
                                 .cornerRadius(12)
                                 .transition(.opacity)
                             }
@@ -117,7 +117,7 @@ struct AddNewBookForm: View {
                         VStack(alignment: .leading, spacing: 16) {
                             Text("BOOK METADATA DETAILS")
                                 .font(.system(size: 11, weight: .bold, design: .rounded))
-                                .foregroundColor(.appCarob.opacity(0.6))
+                                .foregroundColor(Theme.carob.opacity(0.6))
                                 .padding(.leading, 4)
                             
                             ElegantInputField(label: "Book Title", placeholder: "e.g., The Stranger", text: $inputTitle)
@@ -129,41 +129,41 @@ struct AddNewBookForm: View {
                             VStack(alignment: .leading, spacing: 6) {
                                 Text("Jumlah Halaman")
                                     .font(.system(size: 12, weight: .bold, design: .rounded))
-                                    .foregroundColor(.appCarob.opacity(0.8))
+                                    .foregroundColor(Theme.carob.opacity(0.8))
                                 
                                 HStack {
                                     Image(systemName: "doc.text")
-                                        .foregroundColor(.appCarob.opacity(0.4))
+                                        .foregroundColor(Theme.carob.opacity(0.4))
                                     TextField("0", value: $inputPageCount, formatter: NumberFormatter())
                                         .keyboardType(.numberPad)
-                                        .foregroundColor(.appCarob)
+                                        .foregroundColor(Theme.carob)
                                 }
                                 .padding(12)
-                                .background(Color.appAlmond)
+                                .background(Theme.almond)
                                 .cornerRadius(10)
                             }
                         }
                         .padding(16)
-                        .background(Color.appVanilla)
+                        .background(Theme.vanilla)
                         .cornerRadius(18)
                         
                         // SECTION 3: BLIND QUOTE CARD
                         VStack(alignment: .leading, spacing: 10) {
                             Text("BLIND QUOTE CONFIGURATION")
                                 .font(.system(size: 11, weight: .bold, design: .rounded))
-                                .foregroundColor(.appCarob.opacity(0.6))
+                                .foregroundColor(Theme.carob.opacity(0.6))
                                 .padding(.leading, 4)
                             
                             TextEditor(text: $inputQuote)
                                 .frame(height: 80)
                                 .padding(8)
                                 .scrollContentBackground(.hidden)
-                                .background(Color.appAlmond)
+                                .background(Theme.almond)
                                 .cornerRadius(12)
-                                .foregroundColor(.appCarob)
+                                .foregroundColor(Theme.carob)
                         }
                         .padding(16)
-                        .background(Color.appVanilla)
+                        .background(Theme.vanilla)
                         .cornerRadius(18)
                         
                         // ACTION LAUNCH BUTTON
@@ -183,9 +183,9 @@ struct AddNewBookForm: View {
                                 .font(.system(.headline, design: .rounded))
                                 .foregroundColor(.white)
                                 .frame(maxWidth: .infinity, minHeight: 50)
-                                .background(inputTitle.isEmpty || inputAuthor.isEmpty ? Color.appPistache : Color.appMatcha)
+                                .background(inputTitle.isEmpty || inputAuthor.isEmpty ? Theme.pistache : Theme.matcha)
                                 .cornerRadius(14)
-                                .shadow(color: Color.appMatcha.opacity(0.2), radius: 6, x: 0, y: 4)
+                                .shadow(color: Theme.matcha.opacity(0.2), radius: 6, x: 0, y: 4)
                         }
                         .disabled(inputTitle.isEmpty || inputAuthor.isEmpty)
                         .padding(.top, 10)
@@ -199,7 +199,7 @@ struct AddNewBookForm: View {
                 ToolbarItem(placement: .navigationBarLeading) {
                     Button("Close") { dismiss() }
                         .font(.system(.body, design: .rounded))
-                        .foregroundColor(.appCarob)
+                        .foregroundColor(Theme.carob)
                 }
             }
         }
@@ -216,13 +216,13 @@ struct ElegantInputField: View {
         VStack(alignment: .leading, spacing: 6) {
             Text(label)
                 .font(.system(size: 12, weight: .bold, design: .rounded))
-                .foregroundColor(.appCarob.opacity(0.8))
+                .foregroundColor(Theme.carob.opacity(0.8))
             
             TextField(placeholder, text: $text)
                 .font(.system(.body, design: .rounded))
-                .foregroundColor(.appCarob)
+                .foregroundColor(Theme.carob)
                 .padding(12)
-                .background(Color.appAlmond)
+                .background(Theme.almond)
                 .cornerRadius(10)
         }
     }
